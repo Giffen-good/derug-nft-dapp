@@ -12,7 +12,7 @@ import {
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
-import { notification } from "antd";
+
 import { useCallback, useMemo } from "react";
 
 const WalletContextProvider = (props) => {
@@ -31,7 +31,7 @@ const WalletContextProvider = (props) => {
   );
 
   const onError = useCallback((error) => {
-    notification["error"]({
+    console.log({
       message: "Error",
       description: error.message
         ? `${error.name}: ${error.message}`

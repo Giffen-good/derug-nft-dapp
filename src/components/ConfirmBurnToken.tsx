@@ -1,20 +1,15 @@
 import { TokenInfo } from '@solana/spl-token-registry';
 import React from 'react';
 
-import { Burnable, BurnMode } from './Types';
-import { getName, getImage } from './utilities';
+import { Burnable, BurnMode } from '../lib/Types';
+import { getName, getImage } from '../lib/utilities';
 
 export interface ConfirmBurnTokenProps {
     onConfirm: () => void;
-
     onCancel: () => void;
-
     burnType: string;
-
     burning: Burnable[];
-
     tokenMap: Map<string, TokenInfo>;
-
     burnMode: BurnMode;
 }
 
@@ -29,16 +24,8 @@ export function ConfirmBurnToken(props: ConfirmBurnTokenProps) {
     } = props;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '70%', minHeight: '380px' }}>
-            <span
-                style={{
-                    fontSize: '26px',
-                    color: 'white',
-                    textAlign: 'center',
-                    marginTop: '30px',
-                    marginBottom: '20px',
-                }}
-            >
+        <div>
+            <span>
                 Are you sure you want to burn:
             </span>
 
