@@ -546,7 +546,7 @@ export function WalletContents(props: WalletContentProps) {
             return (
                 <div>
                     <span>
-                        {`No ${burnTypeLower}s found! Ensure you have the correct wallet selected.`}
+                        {`No FOMO Bombs found! Ensure you have the correct wallet selected.`}
                     </span>
                 </div>
             )

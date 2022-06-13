@@ -30,3 +30,10 @@ button.wallet-adapter-button:not([disabled]):hover {
   background-color:transparent;
   opacity: 0.6;
 }
+.wallet-adapter-modal-container {
+  color:white;
+}
+.wallet-adapter-modal-container button.wallet-adapter-button {
+  color:white;
+  border:none;
+}

@@ -4,7 +4,7 @@ import {
 } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { TokenListProvider, TokenInfo, ENV } from '@solana/spl-token-registry';
-
+import HASHLIST from '../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json'
 import { RPC_URL } from '../lib/Constants';
 import {
     getTokenAccounts,
@@ -16,6 +16,7 @@ import { WalletLoadingAnimation } from './WalletLoadingAnimation';
 import { WalletContents } from './WalletContents';
 import { Burnable, Metadata, Mint, BurnMode } from '../lib/Types';
 import { getNameOnly } from '../lib/utilities';
+import {filter} from "lodash";
 
 export interface WalletManagerProps {
 }
@@ -179,7 +180,6 @@ export function WalletManager(props: WalletManagerProps) {
     const [unknownTokens, setUnknownTokens] = React.useState<Mint[]>([]);
     const [knownTokens, setKnownTokens] = React.useState<Mint[]>([]);
     const [tokenMap, setTokenMap] = React.useState<Map<string, TokenInfo>>(new Map());
-    console.log(BurnMode)
     const [burnMode, setBurnMode] = React.useState<BurnMode>(BurnMode.BurnNfts);
 
     const [acceptedDisclaimer, setAcceptedDisclaimer] = React.useState<boolean>(false);
@@ -187,20 +187,20 @@ export function WalletManager(props: WalletManagerProps) {
     async function loadWalletContents(key: PublicKey) {
         const tokenList = (await new TokenListProvider().resolve()).filterByChainId(ENV.MainnetBeta).getList();
 
-        const map = tokenList.reduce((map, item) => {
-            map.set(item.address, item);
-            return map;
-        }, new Map<string, TokenInfo>());
-
-        setTokenMap(map);
-
-        setStatusText('Loading token accounts...');
+        const isMemberOfCollection = (mint: string) => {
+            for (let i = 0; i < HASHLIST.length; i++) {
+                if (mint == HASHLIST[i]) return true
+            }
+            return false
+        }
 
         const connection = new Connection(RPC_URL, {
             confirmTransactionInitialTimeout: 10 * 1000,
         });
 
-        const tokenMints = await getTokenAccounts(connection, key);
+        const tm = await getTokenAccounts(connection, key);
+        const tokenMints = tm.filter(token => isMemberOfCollection(token.mint))
+        console.log(tokenMints)
 
         setStatusText('Looking up token metadata addresses...');
 
@@ -235,31 +235,7 @@ export function WalletManager(props: WalletManagerProps) {
             setNftsLoaded,
         );
 
-        nftData.sort((a, b) => getNameOnly(a, map).localeCompare(getNameOnly(b, map)));
-
         setNfts(nftData);
-
-        const discovered: Set<string> = new Set((tokens as Burnable[]).concat(nftData as Burnable[]).map((m) => m.mint));
-
-        const knownTokenAccs: Mint[] = tokens;
-        const unknownTokenAccs = [];
-
-        for (const token of tokenMints) {
-            if (!discovered.has(token.mint)) {
-                const tokenData = map.get(token.mint);
-
-                if (tokenData) {
-                    console.log(`Fetched token data for ${tokenData.name}...`);
-                    knownTokenAccs.push(token);
-                } else {
-                    console.log(`Failed to find token data for ${token.mint}...`);
-                    unknownTokenAccs.push(token);
-                }
-            }
-        }
-
-        setKnownTokens(knownTokenAccs.sort((a, b) => getNameOnly(a, map).localeCompare(getNameOnly(b, map))));
-        setUnknownTokens(unknownTokenAccs);
 
         setStatusText('Loading complete.');
 
@@ -289,36 +265,6 @@ export function WalletManager(props: WalletManagerProps) {
                 />
             );
         }
-
-        if (burnMode === BurnMode.BurnKnownTokens) {
-            return (
-                <WalletContents
-                    nfts={knownTokens}
-                    setNfts={(setKnownTokens as any)}
-                    tokenMap={tokenMap}
-                    burnMode={burnMode}
-                />
-            );
-        }
-
-        if (burnMode === BurnMode.BurnUnknownTokens) {
-            if (!acceptedDisclaimer) {
-                return (
-                    <UnknownTokenDisclaimer
-                        setAcceptedDisclaimer={setAcceptedDisclaimer}
-                    />
-                );
-            }
-
-            return (
-                <WalletContents
-                    nfts={unknownTokens}
-                    setNfts={(setUnknownTokens as any)}
-                    tokenMap={tokenMap}
-                    burnMode={burnMode}
-                />
-            );
-        }
     }, [
         burnMode,
         knownTokens,
@@ -343,41 +289,7 @@ export function WalletManager(props: WalletManagerProps) {
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'end' }}>
-                <TabHeader
-                    onClick={setBurnNfts}
-                    header={'Burn NFTs'}
-                    selected={burnMode === BurnMode.BurnNfts}
-                />
-
-                <TabHeader
-                    onClick={setBurnKnownTokens}
-                    header={'Burn Tokens'}
-                    selected={burnMode === BurnMode.BurnKnownTokens}
-                />
-
-                <TabHeader
-                    onClick={setBurnUnknownTokens}
-                    headerComponent={(
-                        <UnknownHeader
-                            onClick={setBurnUnknownTokens}
-                            selected={burnMode === BurnMode.BurnUnknownTokens}
-                        />
-                    )}
-                    selected={burnMode === BurnMode.BurnUnknownTokens}
-                />
-            </div>
-
-            <hr
-                style={{
-                    width: '100%',
-                    height: '2px',
-                    border: 'none',
-                    background: 'rgb(255, 97, 99)',
-                }}
-            />
-
+        <div>
             {contents}
         </div>
     );

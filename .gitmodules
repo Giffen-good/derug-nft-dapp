@@ -1,0 +1,3 @@
+[submodule "scripts/scrape-and-mint-nft"]
+	path = scripts/scrape-and-mint-nft
+	url = git@github.com:Giffen-good/scrape-and-mint-nft.git

@@ -28,10 +28,7 @@ export function WalletLoadingAnimation(props: WalletLoadingProps) {
             alignItems: 'center',
             marginTop: '40px',
         }}>
-            <span style={{
-                color: 'white',
-                fontSize: '30px',
-            }}>
+            <span >
                 {statusText}
             </span>
             <hr
@@ -42,11 +39,7 @@ export function WalletLoadingAnimation(props: WalletLoadingProps) {
                     width: '100%',
                 }}
             />
-            <span style={{
-                color: 'white',
-                fontSize: '24px',
-                marginBottom: '250px',
-            }}>
+            <span>
                 {text}
             </span>
         </div>
