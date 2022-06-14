@@ -13,10 +13,22 @@ import {
 import { decodeMetadata } from './metaplex/metadata';
 import { fetchWithRetry } from './utilities';
 import React from "react";
+import * as HASHLIST
+    from "../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json";
 
+
+const HASH: {[index: string]: string} = HASHLIST
+
+const getAssociatedMetaPin = (mint: string) => {
+    return HASH[mint]
+}
 /* Some inspiration taken from
  * https://github.com/NftEyez/sol-rayz/blob/main/packages/sol-rayz/src/getParsedNftAccountsByOwner.ts */
 export async function getTokenAccounts(connection: Connection, publicKey: PublicKey): Promise<Mint[]> {
+    const isMemberOfCollection = (mint: string): string | false => {
+        if (HASH[mint] && HASH[mint] !== 'undefined') return HASH[mint]
+        return false
+    }
     while (true) {
         try {
             console.log(`Fetching token accounts...`);
@@ -28,7 +40,8 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
 
             const nftAccounts = value.filter(({ account }) => {
                 const amount = account?.data?.parsed?.info?.tokenAmount?.uiAmount;
-                return amount > 0 && account.data.parsed.info.mint !== WRAPPED_SOL;
+                const inCollection = isMemberOfCollection(account.data.parsed.info.mint)
+                return amount > 0 && account.data.parsed.info.mint !== WRAPPED_SOL && inCollection;
             }).map(({ account, pubkey }) => {
                 const amounts = account?.data?.parsed?.info?.tokenAmount;
 
@@ -37,8 +50,9 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
                     tokenAcc: pubkey,
                     count: Number(amounts.amount),
                     uiAmount: Number(amounts.uiAmount),
-                    markForBurn: false,
+                    markForBurn: true,
                     burnt: false,
+                    metadata: HASH[account.data.parsed.info.mint]
                 };
             });
 
@@ -132,7 +146,7 @@ async function getMetadataAccountChunk(
                 if (meta) {
                     try {
                         const result = decodeMetadata(meta.data);
-
+                        const m = getAssociatedMetaPin(result.mint)
                         const {
                             tokenAcc,
                             count,
@@ -144,11 +158,12 @@ async function getMetadataAccountChunk(
                             url: result.data.uri,
                             tokenAcc,
                             count,
-                            markForBurn: false,
+                            markForBurn: true,
                             burnt: false,
                             uiAmount,
                             name: result.data.name,
                             symbol: result.data.symbol,
+                            metadata: m
                         });
 
                         setStatusText(`Loaded ${result.data.name} account...`);
@@ -222,7 +237,7 @@ async function fetchMetadataURL(
                 tokenAcc: url.tokenAcc,
                 name: url.name,
                 symbol: url.symbol,
-                markForBurn: false,
+                markForBurn: true,
                 uiAmount: url.uiAmount,
                 burnt: false,
             }};
@@ -269,7 +284,7 @@ async function fetchMetadataURL(
                 tokenAcc: url.tokenAcc,
                 name: url.name,
                 symbol: url.symbol,
-                markForBurn: false,
+                markForBurn: true,
                 uiAmount: url.uiAmount,
                 ...data,
             },
@@ -284,7 +299,7 @@ async function fetchMetadataURL(
             tokenAcc: url.tokenAcc,
             name: url.name,
             symbol: url.symbol,
-            markForBurn: false,
+            markForBurn: true,
             burnt: false,
             uiAmount: url.uiAmount,
         }};

@@ -41,6 +41,7 @@ export interface Burnable {
     markForBurn: boolean;
     burnt: boolean;
     uiAmount: number;
+    metadata?: string;
 }
 
 export interface Mint extends Burnable {

@@ -12,7 +12,7 @@ const Home = () => {
                 <div className={'flex-1 flex items-center '}>
                     <div className={'pb-20 pr-4 mx-auto max-w-2xl'}>
                         <h1 className={'uppercase text-6xl '}>Here is to a new beginning BOMBS</h1>
-                        {connected && publicKey ? <WalletManager /> : <h2 className={"font-sans"}>Please Connect your wallet to begin.</h2>}
+                        {connected && publicKey ? <WalletManager /> : <h2 className={""}>Please Connect your wallet to begin.</h2>}
                     </div>
                 </div>
             </div>

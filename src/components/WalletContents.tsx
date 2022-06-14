@@ -1,12 +1,12 @@
 import React from 'react';
 import * as _ from 'lodash';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import {
     Connection,
     Transaction,
     TransactionInstruction,
     PublicKey,
+
 } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
@@ -16,11 +16,14 @@ import { TokenInfo } from '@solana/spl-token-registry';
 import { RPC_URL } from '../lib/Constants';
 import { Metadata, Mint, BurnMode, Burnable } from '../lib/Types';
 import { NFTS_PER_PAGE, MAX_BURNS_PER_TX, INCINERATOR_ACCOUNT } from '../lib/Constants';
-import { ConfirmBurnToken } from '../components/ConfirmBurnToken';
+import {mintNFT} from "../lib/mintNFT";
 import {
     getImage,
     getName,
 } from '../lib/utilities';
+import {NodeWallet} from "@metaplex/js";
+import * as HASHLIST
+    from "../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json";
 
 export interface WalletContentProps {
     nfts: Burnable[];
@@ -100,7 +103,6 @@ export function WalletContents(props: WalletContentProps) {
         tokenMap,
         burnMode,
     } = props;
-
     const [page, setPage] = React.useState<number>(0);
     const [burning, setBurning] = React.useState<boolean>(false);
     const [statusMessage, setStatusMessage] = React.useState<string>('');
@@ -108,7 +110,7 @@ export function WalletContents(props: WalletContentProps) {
 
     const {
         publicKey,
-        signAllTransactions,
+        signAllTransactions
     } = useWallet();
 
     const pages = React.useMemo(() => {
@@ -251,17 +253,38 @@ export function WalletContents(props: WalletContentProps) {
 
         for (const chunk of chunks) {
             const transaction = new Transaction();
-
+            const tx2 = new Transaction();
+            // const mintIX = mintNFT(
+            //     connection,
+            //     publicKey,
+            //     ,
+            //     0
+            // );
             for (const nft of chunk) {
+                console.log({nft})
+                const mintIX = await mintNFT(
+                    {
+                        connection,
+                        publicKey,
+                        pin: nft.metadata,
+                        maxSupply: 0
+                    }
+
+                );
+                console.log(mintIX)
+
                 transaction.add(
                     createBurnInstruction(nft),
                     createCloseAccountInstruction(nft),
-                );
-            }
 
+                );
+                tx2.add(...mintIX)
+            }
+            tx2.feePayer = publicKey;
+            tx2.recentBlockhash = recentBlockHash;
             transaction.feePayer = publicKey;
             transaction.recentBlockhash = recentBlockHash;
-
+            // transactions.push(tx2)
             transactions.push(transaction);
         }
 
@@ -467,82 +490,9 @@ export function WalletContents(props: WalletContentProps) {
     }, [acceptedDisclaimer]);
 
     const data = React.useMemo(() => {
-        function PageData() {
-            if (pageCount === 0) {
-                return null;
-            }
 
-            const pageData = pages[page];
 
-            if (!pageData) {
-                return null;
-            }
-
-            return (
-                <>
-                    {pages[page].map((nft: Burnable, i: number) => {
-                        const name = getName(nft, tokenMap, burnMode === BurnMode.BurnNfts);
-
-                        const fontSize = getFontSize(name);
-
-                        const toggleBurn = markForBurn.bind(null, nft.mint, !nft.markForBurn);
-
-                        const overlay = nft.burnt || nft.markForBurn
-                            ? <BurnOverlay
-                                toggleBurn={(e) => markForBurn(nft.mint, !nft.markForBurn, e)}
-                                text={nft.burnt ? 'Burnt!' : 'Marked'}
-                                markForBurn={nft.markForBurn}
-                                burnMode={burnMode}
-                            />
-                            : <BurnOverlay
-                                toggleBurn={(e) => markForBurn(nft.mint, !nft.markForBurn, e)}
-                                text={'Mark for burn'}
-                                markForBurn={nft.markForBurn}
-                                burnMode={burnMode}
-                            />;
-
-                        const url = getImage(nft, tokenMap);
-
-                        return (
-                            <div className='row-item' key={nft.mint}>
-                                <div
-                                    onClick={toggleBurn}
-                                >
-                                    <div
-                                        onClick={toggleBurn}
-                                    >
-                                    </div>
-                                    {overlay}
-                                </div>
-                                <div>
-                                    <span>
-                                        {name}
-                                    </span>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </>
-            )
-        };
-
-        const burnType = burnMode === BurnMode.BurnNfts ? 'NFT' : 'Token';
-        const burnTypeLower = burnMode === BurnMode.BurnNfts ? 'NFT' : 'token';
-
-        if (burning && !acceptedDisclaimer && burningNfts.length !== 0) {
-            return (
-                <ConfirmBurnToken
-                    onConfirm={confirmBurn}
-                    onCancel={() => setBurning(false)}
-                    burnType={burnTypeLower}
-                    burning={burningNfts}
-                    tokenMap={tokenMap}
-                    burnMode={burnMode}
-                />
-            );
-        }
-
-        if (pageCount === 0) {
+        if (!nfts.length) {
             return (
                 <div>
                     <span>
@@ -555,56 +505,31 @@ export function WalletContents(props: WalletContentProps) {
         return (
             <div>
                 <div>
-                    <div className='row'>
-                        <PageData/>
-                    </div>
-
-                    {pageCount > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div onClick={() => changePage(-1)} style={{ cursor: 'pointer' }}>
-                                <FontAwesomeIcon
-                                    icon={faArrowLeft}
-                                    size={'2x'}
-                                    color={'#ff6163'}
-                                />
-                            </div>
-
-                            <span style={{ color: 'white', fontSize: '20px', marginLeft: '10px', marginRight: '10px' }}>
-                                {`Page ${page+1} of ${pageCount}`}
-                            </span>
-
-                            <div onClick={() => changePage(1)} style={{ cursor: 'pointer' }}>
-                                <FontAwesomeIcon
-                                    icon={faArrowRight}
-                                    size={'2x'}
-                                    color={'#ff6163'}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {burnCount > 0 && (
-                        <>
-                            <button
-                                className='burn-button'
-                                style={{ marginTop: '30px', color: !burning ? 'white' : 'black', cursor: !burning ? 'pointer' : 'unset' }}
-                                onClick={() => setBurning(true)}
-                            >
-                                Burn {`${burnCount === 1 ? burnType : `${burnCount} ${burnType}s`}`}
-                            </button>
-                        </>
-                    )}
 
                     {statusMessage !== '' && (
-                        <span style={{ color: 'white', fontSize: '20px', marginTop: '20px', width: '60%', whiteSpace: 'pre-wrap', textAlign: 'center' }}>
+                        <div>
                             {statusMessage}
-                        </span>
+                        </div>
                     )}
-
+                    {acceptedDisclaimer && (
+                        <div>Burn and mint complete</div>
+                    )}
                     {burnCount > MAX_BURNS_PER_TX && !burning && (
-                        <span style={{ color: 'white', fontSize: '20px', marginTop: '20px' }}>
+                        <div>
                             {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}
-                        </span>
+                        </div>
+                    )}
+                    {burnCount > 0 && (
+                        <>
+                            <div>
+                                {`We found ${burnCount} FOMO Bombs in your wallet!`}
+                            </div>
+                            <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16  akira'}
+                                    onClick={confirmBurn}
+                            >
+                                Burn
+                            </button>
+                        </>
                     )}
                 </div>
             </div>

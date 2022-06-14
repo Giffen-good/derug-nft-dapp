@@ -9,6 +9,14 @@
   /* other formats include: 'woff2', 'truetype, 'opentype',
                             'embedded-opentype', and 'svg' */
 }
+
+@font-face {
+  font-family: 'akira';
+  src: local('akira'), url('./assets/akira-expanded.otf') format('opentype');
+
+  /* other formats include: 'woff2', 'truetype, 'opentype',
+                            'embedded-opentype', and 'svg' */
+}
 body {
   margin: 0;
   font-family: 'ahaWow', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -36,4 +44,7 @@ button.wallet-adapter-button:not([disabled]):hover {
 .wallet-adapter-modal-container button.wallet-adapter-button {
   color:white;
   border:none;
+}
+.akira {
+  font-family: 'akira', "Arial Black"
 }

@@ -7,7 +7,6 @@ import { getName, getImage } from '../lib/utilities';
 export interface ConfirmBurnTokenProps {
     onConfirm: () => void;
     onCancel: () => void;
-    burnType: string;
     burning: Burnable[];
     tokenMap: Map<string, TokenInfo>;
     burnMode: BurnMode;
@@ -17,7 +16,6 @@ export function ConfirmBurnToken(props: ConfirmBurnTokenProps) {
     const {
         onConfirm,
         onCancel,
-        burnType,
         burning,
         tokenMap,
         burnMode,
@@ -25,10 +23,6 @@ export function ConfirmBurnToken(props: ConfirmBurnTokenProps) {
 
     return (
         <div>
-            <span>
-                Are you sure you want to burn:
-            </span>
-
             {burning.map((t) => (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px', }} key={t.mint}>
                     <img
@@ -74,7 +68,6 @@ export function ConfirmBurnToken(props: ConfirmBurnTokenProps) {
                     textAlign: 'center',
                 }}
             >
-                {`These ${burnType}s will be burned by executing the burn instruction. This process cannot be reversed. Make sure you have the correct ${burnType}s selected!`}
             </span>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '50px', marginBottom: '30px' }}>

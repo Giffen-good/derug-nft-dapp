@@ -4,13 +4,11 @@ import {
 } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { TokenListProvider, TokenInfo, ENV } from '@solana/spl-token-registry';
-import HASHLIST from '../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json'
 import { RPC_URL } from '../lib/Constants';
 import {
     getTokenAccounts,
     getMetadataAddresses,
     getMetadataAccounts,
-    getMetadata,
 } from '../lib/LoadWalletData';
 import { WalletLoadingAnimation } from './WalletLoadingAnimation';
 import { WalletContents } from './WalletContents';
@@ -176,7 +174,7 @@ export function WalletManager(props: WalletManagerProps) {
     const [nftsLoaded, setNftsLoaded] = React.useState<number>(0);
     const [statusText, setStatusText] = React.useState<string | null>(null);
 
-    const [nfts, setNfts] = React.useState<Metadata[]>([]);
+    const [nfts, setNfts] = React.useState<Burnable[]>([]);
     const [unknownTokens, setUnknownTokens] = React.useState<Mint[]>([]);
     const [knownTokens, setKnownTokens] = React.useState<Mint[]>([]);
     const [tokenMap, setTokenMap] = React.useState<Map<string, TokenInfo>>(new Map());
@@ -187,19 +185,12 @@ export function WalletManager(props: WalletManagerProps) {
     async function loadWalletContents(key: PublicKey) {
         const tokenList = (await new TokenListProvider().resolve()).filterByChainId(ENV.MainnetBeta).getList();
 
-        const isMemberOfCollection = (mint: string) => {
-            for (let i = 0; i < HASHLIST.length; i++) {
-                if (mint == HASHLIST[i]) return true
-            }
-            return false
-        }
 
         const connection = new Connection(RPC_URL, {
             confirmTransactionInitialTimeout: 10 * 1000,
         });
 
-        const tm = await getTokenAccounts(connection, key);
-        const tokenMints = tm.filter(token => isMemberOfCollection(token.mint))
+        const tokenMints = await getTokenAccounts(connection, key);
         console.log(tokenMints)
 
         setStatusText('Looking up token metadata addresses...');
@@ -217,28 +208,18 @@ export function WalletManager(props: WalletManagerProps) {
 
         setStatusText('Loading token on chain metadata...');
 
-        const metadataAccounts = await getMetadataAccounts(
+        const nftData = await getMetadataAccounts(
             connection,
             metadataAddresses,
             setStatusText,
         );
 
-        if (metadataAccounts.length !== metadataAddresses.length) {
-            setNftCount(metadataAccounts.length);
+        if (nftData.length !== nftData.length) {
+            setNftCount(nftData.length);
         }
 
-        setStatusText('Loading token metadata...');
-
-        const { tokens, nfts: nftData } = await getMetadata(
-            metadataAccounts,
-            setStatusText,
-            setNftsLoaded,
-        );
-
         setNfts(nftData);
-
         setStatusText('Loading complete.');
-
         setLoading(false);
     }
 
@@ -250,9 +231,6 @@ export function WalletManager(props: WalletManagerProps) {
         loadWalletContents(publicKey);
     }, [publicKey]);
 
-    const setBurnNfts = setBurnMode.bind(null, BurnMode.BurnNfts);
-    const setBurnKnownTokens = setBurnMode.bind(null, BurnMode.BurnKnownTokens);
-    const setBurnUnknownTokens = setBurnMode.bind(null, BurnMode.BurnUnknownTokens);
 
     const contents = React.useMemo(() => {
         if (burnMode === BurnMode.BurnNfts) {
