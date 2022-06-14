@@ -1,6 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
 
-export const RPC_URL: string = 'https://late-snowy-cherry.solana-devnet.quiknode.pro/223eb8cd5ee2c52058b1366d401dca25e6fd5ce1/';
 
 
 export const METADATA_ADDRESS_BATCH_SIZE: number = 100;
