@@ -13,8 +13,8 @@ import { actions, utils } from "@metaplex/js";
 import type {
     CreateMasterEditionParams
 } from "@metaplex-foundation/mpl-token-metadata/dist/src/transactions/CreateMasterEdition";
-import {Transaction} from "@solana/web3.js";
-
+import { Transaction } from '@metaplex-foundation/mpl-core';
+import {Keypair} from "@solana/web3.js";
 export interface MintNFTParams {
     connection: Connection;
     publicKey: PublicKey;
@@ -22,19 +22,14 @@ export interface MintNFTParams {
     maxSupply?: number;
 }
 
-// export interface MintNFTResponse {
-//     txId: string;
-//     mint: PublicKey;
-//     metadata: PublicKey;
-//     edition: PublicKey;
-// }
+
 
 export const mintNFT = async ({
                                   connection,
                                   publicKey,
                                   pin,
                                   maxSupply,
-                              }: MintNFTParams): Promise<[Transaction, CreateMetadata, Transaction, Transaction, CreateMasterEdition]> => {
+                              }: MintNFTParams): Promise<Transaction> => {
     const { mint, createMintTx, createAssociatedTokenAccountTx, mintToTx } =
         await actions.prepareTokenAccountAndMintTxs(connection, publicKey);
     console.log({pin})
@@ -106,12 +101,18 @@ export const mintNFT = async ({
         { feePayer: publicKey },
         cmeParams
     );
-        return [
+        const txs =  [
             createMintTx,
             createMetadataTx,
             createAssociatedTokenAccountTx,
             mintToTx,
             masterEditionTx,
         ]
-
+    const tx = Transaction.fromCombined(txs, { feePayer: publicKey })
+    tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+    const signers = [mint];
+    if (signers.length) {
+        tx.partialSign(...signers);
+    }
+    return tx;
 };

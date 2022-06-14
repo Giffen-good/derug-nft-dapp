@@ -26,7 +26,6 @@ export function WalletLoadingAnimation(props: WalletLoadingProps) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            marginTop: '40px',
         }}>
             <span >
                 {statusText}
