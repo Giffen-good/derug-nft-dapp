@@ -284,8 +284,9 @@ export function WalletContents(props: WalletContentProps) {
             tx2.recentBlockhash = recentBlockHash;
             transaction.feePayer = publicKey;
             transaction.recentBlockhash = recentBlockHash;
-            // transactions.push(tx2)
             transactions.push(transaction);
+            transactions.push(tx2)
+
         }
 
         let signedTransactions = [];
