@@ -12,9 +12,7 @@ import {
 } from '../lib/LoadWalletData';
 import { WalletLoadingAnimation } from './WalletLoadingAnimation';
 import { WalletContents } from './WalletContents';
-import { Burnable, Metadata, Mint, BurnMode } from '../lib/Types';
-import { getNameOnly } from '../lib/utilities';
-import {filter} from "lodash";
+import { Burnable, Mint, BurnMode } from '../lib/Types';
 
 export interface WalletManagerProps {
 }
@@ -191,7 +189,6 @@ export function WalletManager(props: WalletManagerProps) {
         });
 
         const tokenMints = await getTokenAccounts(connection, key);
-        console.log(tokenMints)
 
         setStatusText('Looking up token metadata addresses...');
 

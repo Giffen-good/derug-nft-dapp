@@ -8,27 +8,40 @@ import {
     METADATA_ACCOUNT_BATCH_SIZE,
     METADATA_URL_BATCH_SIZE,
     CORS_PROXY,
-    WRAPPED_SOL,
+    WRAPPED_SOL, API_URL,
 } from './Constants';
 import { decodeMetadata } from './metaplex/metadata';
 import { fetchWithRetry } from './utilities';
 import React from "react";
-import * as HASHLIST
-    from "../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json";
+import axios from "axios";
 
 
-const HASH: {[index: string]: string} = HASHLIST
 
-const getAssociatedMetaPin = (mint: string) => {
-    return HASH[mint]
-}
+// export async function getMintList(): Promise<string> {
+//     try {
+//         const { data } = await axios.get<string>(API_URL + '/getMintList')
+//         console.log(data)
+//         // console.log(JSON.stringify(data, null, 4))
+//         return data;
+//
+//     } catch (error) {
+//         if (axios.isAxiosError(error)) {
+//             console.log('error message: ', error.message);
+//             // 👇️ error: AxiosError<any, any>
+//             return error.message;
+//         } else {
+//             console.log('unexpected error: ', error);
+//             return 'An unexpected error occurred';
+//         }
+//     }
+// }
 /* Some inspiration taken from
  * https://github.com/NftEyez/sol-rayz/blob/main/packages/sol-rayz/src/getParsedNftAccountsByOwner.ts */
 export async function getTokenAccounts(connection: Connection, publicKey: PublicKey): Promise<Mint[]> {
-    const isMemberOfCollection = (mint: string): string | false => {
-        if (HASH[mint] && HASH[mint] !== 'undefined') return HASH[mint]
-        return false
+    const isMemberOfCollection = (mintAddress: string, hashlist: string[] ): Boolean => {
+        return hashlist.includes(mintAddress)
     }
+    const hashlist = await getHashlist();
     while (true) {
         try {
             console.log(`Fetching token accounts...`);
@@ -40,7 +53,7 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
 
             const nftAccounts = value.filter(({ account }) => {
                 const amount = account?.data?.parsed?.info?.tokenAmount?.uiAmount;
-                const inCollection = isMemberOfCollection(account.data.parsed.info.mint)
+                const inCollection = isMemberOfCollection(account.data.parsed.info.mint, hashlist)
                 return amount > 0 && account.data.parsed.info.mint !== WRAPPED_SOL && inCollection;
             }).map(({ account, pubkey }) => {
                 const amounts = account?.data?.parsed?.info?.tokenAmount;
@@ -51,8 +64,7 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
                     count: Number(amounts.amount),
                     uiAmount: Number(amounts.uiAmount),
                     markForBurn: true,
-                    burnt: false,
-                    metadata: HASH[account.data.parsed.info.mint]
+                    burnt: false
                 };
             });
 
@@ -65,7 +77,15 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
         }
     }
 }
-
+export async function getHashlist(): Promise<string[]> {
+    try {
+        const { data } = await axios.get(API_URL + '/getMintList');
+        return data.hashlist;
+    } catch (error) {
+        console.log(error)
+        return []
+    }
+}
 export async function getMetadataAddresses(
     connection: Connection,
     tokenMints: Mint[]) {
@@ -146,7 +166,6 @@ async function getMetadataAccountChunk(
                 if (meta) {
                     try {
                         const result = decodeMetadata(meta.data);
-                        const m = getAssociatedMetaPin(result.mint)
                         const {
                             tokenAcc,
                             count,
@@ -162,8 +181,7 @@ async function getMetadataAccountChunk(
                             burnt: false,
                             uiAmount,
                             name: result.data.name,
-                            symbol: result.data.symbol,
-                            metadata: m
+                            symbol: result.data.symbol
                         });
 
                         setStatusText(`Loaded ${result.data.name} account...`);

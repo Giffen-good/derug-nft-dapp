@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js';
+import {AccountInfo, ParsedAccountData, PublicKey} from '@solana/web3.js';
 
 export interface Attribute {
     trait_type: string;
@@ -41,9 +41,11 @@ export interface Burnable {
     markForBurn: boolean;
     burnt: boolean;
     uiAmount: number;
-    metadata?: string;
 }
-
+export interface NftAccountData {
+    account: AccountInfo<ParsedAccountData>;
+    pubkey: PublicKey;
+}
 export interface Mint extends Burnable {
 }
 

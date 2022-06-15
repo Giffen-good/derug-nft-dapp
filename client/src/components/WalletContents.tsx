@@ -12,8 +12,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import BN from 'bn.js';
 import { TokenInfo } from '@solana/spl-token-registry';
-
-import { RPC_URL } from '../lib/Constants';
+import axios from 'axios';
+import {API_URL, RPC_URL} from '../lib/Constants';
 import { Metadata, Mint, BurnMode, Burnable } from '../lib/Types';
 import { NFTS_PER_PAGE, MAX_BURNS_PER_TX, INCINERATOR_ACCOUNT } from '../lib/Constants';
 import {mintNFT} from "../lib/mintNFT";
@@ -40,67 +40,10 @@ export interface BurnOverlayProps {
     burnMode: BurnMode;
 }
 
-function getFontSize(name: string) {
-    const len = name.length;
-
-    if (len < 10) {
-        return '26px';
-    }
-
-    if (len < 15) {
-        return '23px';
-    }
-
-    if (len < 18) {
-        return '21px';
-    }
-
-    if (len < 20) {
-        return '19px';
-    }
-
-    if (len < 25) {
-        return '18px';
-    }
-
-    if (len < 30) {
-        return '17px';
-    }
-
-    if (len < 40) {
-        return '16px';
-    }
-
-    if (len < 60) {
-        return '15px';
-    }
-
-    return '5px';
-}
-
-function BurnOverlay(props: BurnOverlayProps) {
-    const {
-        toggleBurn,
-        text,
-        markForBurn,
-        burnMode,
-    } = props;
-
-    return (
-        <div
-            onClick={toggleBurn}
-        >
-            <span>
-                {text}
-            </span>
-        </div>
-    );
-}
 
 export function WalletContents(props: WalletContentProps) {
     const {
         nfts,
-        setNfts,
         tokenMap,
         burnMode,
     } = props;
@@ -111,7 +54,6 @@ export function WalletContents(props: WalletContentProps) {
 
     const {
         publicKey,
-        signTransaction,
         signAllTransactions
     } = useWallet();
 
@@ -135,105 +77,43 @@ export function WalletContents(props: WalletContentProps) {
         onBurnComplete();
     }, [burnMode]);
 
-    function markForBurn(mint: string, burn: boolean, e: React.MouseEvent<HTMLDivElement>) {
-        e.stopPropagation();
-
-        if (burning) {
-            return;
-        }
-
-        const newNfts = _.cloneDeep(nfts);
-
-        for (const nft of newNfts) {
-            if (nft.mint === mint) {
-                nft.markForBurn = burn;
-            }
-        }
-
-        setNfts(newNfts);
-    }
-
-    function changePage(pages: number) {
-        setPage((currentPage) => {
-            if (currentPage + pages < 0) {
-                return currentPage;
-            }
-
-            if (currentPage + pages >= pageCount) {
-                return currentPage;
-            }
-
-            return currentPage + pages;
-        });
-    }
-
-    function createCloseAccountInstruction(nft: Burnable) {
-        const keys = [
-            {
-                pubkey: nft.tokenAcc,
-                isSigner: false,
-                isWritable: true,
-            },
-            {
-                pubkey: publicKey as PublicKey,
-                isSigner: false,
-                isWritable: true,
-            },
-            {
-                pubkey: publicKey as PublicKey,
-                isSigner: true,
-                isWritable: false,
-            },
-            {
-                /* This address is not used for anything - just for identifying our burn transactions in the API */
-                pubkey: INCINERATOR_ACCOUNT,
-                isSigner: false,
-                isWritable: false,
-            },
-        ];
-
-        const closeAccountInstruction = 9;
-
-        return new TransactionInstruction({
-            keys,
-            programId: TOKEN_PROGRAM_ID,
-            data: Buffer.from([closeAccountInstruction]),
-        });
-    }
-
-    function createBurnInstruction(nft: Burnable) {
-        const keys = [
-            {
-                pubkey: nft.tokenAcc,
-                isSigner: false,
-                isWritable: true,
-            },
-            {
-                pubkey: new PublicKey(nft.mint),
-                isSigner: false,
-                isWritable: true,
-            },
-            {
-                pubkey: publicKey as PublicKey,
-                isSigner: true,
-                isWritable: false,
-            },
-        ];
-
-        const burnInstruction = 8;
-
-        return new TransactionInstruction({
-            keys,
-            programId: TOKEN_PROGRAM_ID,
-            data: Buffer.from([burnInstruction, ...new BN(nft.count).toArray("le", 8)]),
-        });
-    }
 
     async function onBurnComplete() {
         setAcceptedDisclaimer(false);
         setBurning(false);
     }
+    async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<Buffer[]> {
+        try {
+            const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
+                key: publicKey.toString(),
+                nfts
+            })
+            console.log(data)
+            // console.log(JSON.stringify(data, null, 4))
+            return data;
 
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log('error message: ', error.message);
+                // 👇️ error: AxiosError<any, any>
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            throw error;
+        }
+    }
+    async function unpackTxs(serializedTxs: Buffer[], connection: Connection) {
+        const txs = []
+        for (const sTx of serializedTxs) {
+            console.log(typeof sTx)
+            const b = Buffer.from(sTx)
+            console.log(b)
+            const tx = Transaction.from(b);
+            tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+            txs.push(tx)
+        }
+        return txs;
+    }
     async function MintAndBurn() {
         if (!signAllTransactions || !publicKey) {
             return;
@@ -241,38 +121,22 @@ export function WalletContents(props: WalletContentProps) {
 
         setStatusMessage('');
 
-        const chunks = _.chunk(burningNfts, MAX_BURNS_PER_TX);
 
-        console.log(`Chunks: ${JSON.stringify(chunks)}`);
 
         const connection = new Connection(RPC_URL, {
             confirmTransactionInitialTimeout: 30 * 1000,
         });
+        if (!publicKey) return
 
-        const transactions = [];
-
-        const recentBlockHash = (await connection.getRecentBlockhash('finalized')).blockhash;
-        for (const chunk of chunks) {
-            // const transaction = new Transaction();
-            for (const nft of chunk) {
-                const tx = await mintNFT(
-                    {
-                        connection,
-                        publicKey,
-                        pin: nft.metadata,
-                        maxSupply: 0
-                    }
-
-                );
-                transactions.push(tx)
-            }
-        }
         let signedTransactions = [];
-
         try {
+            const serializedTxs = await getMintAndBurnTxs(burningNfts, publicKey);
+            const transactions = await unpackTxs(serializedTxs, connection);
             signedTransactions = await signAllTransactions(transactions);
+
         } catch (err) {
-            setStatusMessage(`Failed to sign transaction: ${(err as any).toString()}`);
+            console.log(err)
+            setStatusMessage(`Failed to build or sign transaction. ${(err as any).toString()}`);
             return;
         }
 
@@ -300,20 +164,20 @@ export function WalletContents(props: WalletContentProps) {
         let errorMessages = [];
 
         for (const transaction of inProgressTransactions) {
-            const nfts = chunks[i++];
-            console.log({nfts})
+            const nft = burningNfts[i]
+            console.log({transaction})
             const {
                 error,
                 timeout,
             } = await transaction;
 
             if (timeout) {
-                timeouts = timeouts.concat(nfts);
+                timeouts = timeouts.concat(nft);
             } else if (error) {
-                errors = errors.concat(nfts);
+                errors = errors.concat(nft);
                 errorMessages.push(error);
             } else {
-                successfullyBurnt = successfullyBurnt.concat(nfts);
+                successfullyBurnt = successfullyBurnt.concat(nft);
             }
         }
 
@@ -349,9 +213,6 @@ export function WalletContents(props: WalletContentProps) {
         }
 
         if (errors.length > 0) {
-            // const names = errors.map((n) => (
-            //     getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            // )).join('\n');
 
             let countMsg = errors.length > 1
                 ? `${errors.length} ${burnTypeLower}s`
@@ -381,230 +242,12 @@ export function WalletContents(props: WalletContentProps) {
             }
         }
 
-  
         setStatusMessage(message);
-
-
-
         await onBurnComplete();
     }
-
-    async function handleFastSlugBurn() {
-        if (!signAllTransactions || !publicKey) {
-            return;
-        }
-
-        setStatusMessage('');
-
-        const chunks = _.chunk(burningNfts, MAX_BURNS_PER_TX);
-
-        console.log(`Chunks: ${JSON.stringify(chunks)}`);
-
-        const connection = new Connection(RPC_URL, {
-            confirmTransactionInitialTimeout: 30 * 1000,
-        });
-
-        const transactions = [];
-
-        const recentBlockHash = (await connection.getRecentBlockhash('finalized')).blockhash;
-        let j = 0;
-        for (const chunk of chunks) {
-            // const transaction = new Transaction();
-            const tx2 = new Transaction();
-            // const mintIX = mintNFT(
-            //     connection,
-            //     publicKey,
-            //     ,
-            //     0
-            // );
-            for (const nft of chunk) {
-                // const mintIX = await mintNFT(
-                //     {
-                //         connection,
-                //         publicKey,
-                //         pin: nft.metadata,
-                //         maxSupply: 0
-                //     }
-                //
-                // );
-                // console.log(mintIX)
-                //
-                // // transaction.add(
-                // //     createBurnInstruction(nft),
-                // //     createCloseAccountInstruction(nft),
-                // //
-                // // );
-                // if (j==0) {
-                //     tx2.add(mintIX)
-                //     console.log({mintIX})
-                // } else {
-                //     break
-                // }
-                // j++;
-            }
-            tx2.feePayer = publicKey;
-            tx2.recentBlockhash = recentBlockHash;
-            // transaction.feePayer = publicKey;
-            // transaction.recentBlockhash = recentBlockHash;
-            // transactions.push(transaction);
-            transactions.push(tx2)
-
-        }
-
-        let signedTransactions = [];
-
-        try {
-            signedTransactions = await signAllTransactions(transactions);
-        } catch (err) {
-            setStatusMessage(`Failed to sign transaction: ${(err as any).toString()}`);
-            return;
-        }
-
-        const inProgressTransactions = [];
-
-        for (const transaction of signedTransactions) {
-            inProgressTransactions.push(
-                sendAndConfirmTransaction(
-                    transaction,
-                    connection,
-                ),
-            );
-        }
-
-        if (inProgressTransactions.length > 1) {
-            setStatusMessage(`Sent ${inProgressTransactions.length} burn transactions, confirming...`);
-        } else {
-            setStatusMessage(`Sent burn transaction, confirming...`);
-        }
-
-        let i = 0;
-
-        let successfullyBurnt: Burnable[] = [];
-        let timeouts: Burnable[] = [];
-        let errors: Burnable[] = [];
-        let errorMessages = [];
-
-        for (const transaction of inProgressTransactions) {
-            const nfts = chunks[i++];
-
-            const {
-                error,
-                timeout,
-            } = await transaction;
-
-            if (timeout) {
-                timeouts = timeouts.concat(nfts);
-            } else if (error) {
-                errors = errors.concat(nfts);
-                errorMessages.push(error);
-            } else {
-                successfullyBurnt = successfullyBurnt.concat(nfts);
-            }
-        }
-
-        let message = '';
-
-        const burntSet = new Set(successfullyBurnt.map((m) => m.mint));
-
-        const burnTypeLower = burnMode === BurnMode.BurnNfts ? 'NFT' : 'token';
-
-        if (successfullyBurnt.length > 0) {
-            const names = successfullyBurnt.map((n) => (
-                getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            )).join('\n');
-
-            let countMsg = successfullyBurnt.length > 1
-                ? `${successfullyBurnt.length} ${burnTypeLower}s`
-                : burnTypeLower;
-
-            message += `Successfully burnt ${countMsg}:\n\n${names}!\n\n`;
-        }
-
-        if (timeouts.length > 0) {
-            const names = timeouts.map((n) => (
-                getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            )).join('\n');
-
-            let countMsg = timeouts.length > 1
-                ? `${timeouts.length} ${burnTypeLower}s`
-                : burnTypeLower;
-
-            message += `Failed to confirm ${countMsg} were burnt after 30 seconds.\n\nFailed:\n${names}\n\n` +
-                `Solana network may be congested, try again, or reload the page if they are truly burnt.\n\n`;
-        }
-
-        if (errors.length > 0) {
-            const names = errors.map((n) => (
-                getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            )).join('\n');
-
-            let countMsg = errors.length > 1
-                ? `${errors.length} ${burnTypeLower}s`
-                : burnTypeLower;
-
-            message += `Encountered errors burning ${countMsg}:\n${errorMessages.join('\n')}\n\nFailed:\n${names}\n\n`;
-
-            let haveTrulyBurntError = false;
-            let haveNodeBehindError = false;
-
-            for (const error of errorMessages) {
-                if (error.includes('invalid account data for instruction')) {
-                    haveTrulyBurntError = true;
-                }
-
-                if (error.includes('Node is behind by')) {
-                    haveNodeBehindError = true;
-                }
-            }
-
-            if (haveTrulyBurntError) {
-                message += `Some NFTs shown may have already been burnt. Try reloading the page to update your owned NFTs.\n\n`;
-            }
-
-            if (haveNodeBehindError) {
-                message += `The node your are currently connected to may be experiencing congestion. Try again, or wait a little bit for the node to recover.`;
-            }
-        }
-
-        const newNfts = nfts.filter((n) => !burntSet.has(n.mint));
-        const chunkedCount = _.chunk(newNfts, NFTS_PER_PAGE).length;
-
-        setNfts(newNfts);
-        setStatusMessage(message);
-
-        if (chunkedCount <= page) {
-            setPage(Math.max(0, chunkedCount - 1));
-        }
-
-        await onBurnComplete();
-    }
-
-    interface ISendTransactionParams {
-        connection: Connection;
-        tx: Transaction;
-        signers?: Keypair[];
-        options?: SendOptions;
-    }
-    const sendTransaction = async ({
-                                       connection,
-                                       tx,
-                                       signers = [],
-                                       options,
-                                   }: ISendTransactionParams): Promise<string> => {
-        tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
-
-        if (signers.length) {
-            tx.partialSign(...signers);
-        }
-        if (signTransaction) {
-            tx = await signTransaction(tx);
-        }
-
-        return connection.sendRawTransaction(tx.serialize(), options);
-    };
 
     async function sendAndConfirmTransaction(
-        transaction: Transaction,
+        transaction:  Transaction,
         connection: Connection,
     ) {
         console.log('sendAndConfirmTransaction')
@@ -621,7 +264,6 @@ export function WalletContents(props: WalletContentProps) {
             });
 
             const result = connection.confirmTransaction(signature!, 'processed');
-            console.log({result})
             try {
                 /* Wait for result or wait for timeout */
                 const res = await Promise.race([timeout, result]);
