@@ -48,3 +48,6 @@ button.wallet-adapter-button:not([disabled]):hover {
 .akira {
   font-family: 'akira', "Arial Black"
 }
+.heading-offset {
+  padding-bottom:112px;
+}

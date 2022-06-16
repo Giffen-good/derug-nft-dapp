@@ -5,17 +5,17 @@ const Home = () => {
     const { connection } = useConnection();
     const { publicKey, connected } = useWallet();
     return (
-            <div className={'h-full flex absolute w-full'}>
-                <div className={'flex-1 h-full relative'}>
-                        <img src={fomoImg} className={'absolute bottom-0'} />
-                </div>
-                <div className={'flex-1 flex items-center '}>
-                    <div className={'pb-20 pr-4 mx-auto max-w-2xl'}>
-                        <h1 className={`uppercase text-6xl ${process.env.SECRET === 'secret' ? 'secret secure': 'or is it'}`}>Here is to a new beginning BOMBS</h1>
-                        {connected && publicKey ? <WalletManager /> : <h2 className={""}>Please Connect your wallet to begin.</h2>}
-                    </div>
+        <>
+            <div className={'flex-auto md:flex-1 h-full md:w-auto w-full'}>
+                <img src={fomoImg} className={'absolute bottom-0 max-w-full sm:max-w-[50%]'} />
+            </div>
+            <div className={' flex-auto md:flex-1 flex pt-10 sm:pt-0 sm:items-center z-10 max-w-full'}>
+                <div className={'heading-offset pr-4 mx-auto max-w-full w-full w-[650px]'}>
+                    <h1 className={`uppercase text-3xl sm:text-5xl md:text-6xl ${process.env.SECRET === 'secret' ? 'secret secure': 'or is it'}`}>Here is to a new beginning BOMBS</h1>
+                    {connected && publicKey ? <WalletManager /> : <h2 className={""}>Please Connect your wallet to begin.</h2>}
                 </div>
             </div>
+        </>
     )
 }
 

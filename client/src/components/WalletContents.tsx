@@ -168,7 +168,7 @@ export function WalletContents(props: WalletContentProps) {
                 ? `${successfullyBurnt.length} ${burnTypeLower}s`
                 : burnTypeLower;
 
-            message += `Successfully burnt and minted ${countMsg} FOMO Bombs`;
+            message += `Successfully Swapped ${countMsg} FOMO Bombs`;
         }
 
         if (timeouts.length > 0) {
@@ -316,7 +316,7 @@ export function WalletContents(props: WalletContentProps) {
                             {/*)}*/}
 
                             {acceptedDisclaimer && (
-                                <div>Initializing Burn and Mint.. </div>
+                                <div>Initializing Swap.. </div>
                             )}
                             {statusMessage !== '' && (
                                 <div>

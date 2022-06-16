@@ -13,7 +13,7 @@ const AppLayout = () => {
           <header className={'flex justify-end p-8'}>
                 <WalletMultiButton className="wallet-button" />
           </header>
-          <main className={'flex-1 relative'}>
+          <main className={'flex-1 relative flex'}>
               <Routes>
                 <Route path="/" element={<Home />} />
               </Routes>
