@@ -23,3 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 .env
 scripts/test-mint-v2
+/scripts
