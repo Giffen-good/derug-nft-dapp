@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node ./app.ts",
     "prod": "NODE_ENV=production node ./dist/app.js",
-    "copy-files": "copyfiles -u 1 map/* dist/map/ && copyfiles -u 1 pk/* dist/pk/",
+    "copy-files": "copyfiles -u 1 map/* dist/map/",
     "start:nodemon": "./node_modules/nodemon/bin/nodemon.js",
     "build": "rimraf dist && tsc -p tsconfig.json && yarn copy-files"
   },
