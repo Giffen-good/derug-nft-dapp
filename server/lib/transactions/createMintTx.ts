@@ -31,7 +31,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
     const {
         name,
         symbol,
-    } = await utils.metadata.lookup(ipfsURL);
+    } = await utils.metadata.lookup(getIpfsMetadataUrl(nft.mint, true));
 
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
