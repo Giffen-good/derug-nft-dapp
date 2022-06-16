@@ -142,7 +142,6 @@ export function WalletContents(props: WalletContentProps) {
         let errorMessages = [];
 
         for (const transaction of inProgressTransactions) {
-            if (MAX_BURNS_PER_TX) break
             const nft = burningNfts[i]
             console.log({transaction})
             const {
@@ -225,7 +224,6 @@ export function WalletContents(props: WalletContentProps) {
 
         try {
             const signature = await connection.sendRawTransaction(transaction.serialize());
-            console.log({signature})
             let timeoutID;
 
             const timeout = new Promise((resolve, reject) => {
@@ -313,7 +311,7 @@ export function WalletContents(props: WalletContentProps) {
                         <>
                             {burnCount > MAX_BURNS_PER_TX && !burning && (
                                 <div className={"text-red-500 text-sm "}>
-                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}
+                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} swaps to complete this process.`}
                                 </div>
                             )}
 

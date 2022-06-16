@@ -3,6 +3,7 @@ import {Burnable} from "../Types";
 import {createMintTx} from "./createMintTx";
 import { getUpdateAuthorityWallet} from "../util";
 import {createBurnTx} from "./createBurnTx";
+import {MAX_BURNS_PER_TX} from "../Constants";
 
 export interface BuildTransactionParams {
     connection: Connection;
@@ -32,6 +33,7 @@ export const buildTransactions = async (
         tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
         tx.partialSign(...signers)
         transactions.push(tx.serialize({requireAllSignatures: false}).toString('base64'))
+        if (MAX_BURNS_PER_TX < transactions.length) break;
     }
 
     return transactions;
