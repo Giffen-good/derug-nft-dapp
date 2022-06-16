@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import dotenv from 'dotenv'
 dotenv.config();
 import express, {NextFunction} from 'express';
