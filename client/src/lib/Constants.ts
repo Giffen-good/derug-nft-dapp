@@ -10,7 +10,7 @@ export const NFTS_PER_PAGE: number = 10;
 
 export const INCINERATOR_ACCOUNT = new PublicKey('burn68h9dS2tvZwtCFMt79SyaEgvqtcZZWJphizQxgt');
 
-export const MAX_BURNS_PER_TX: number = 1;
+export const MAX_BURNS_PER_TX: number = 25;
 
 export const CORS_PROXY: string = 'https://letsalllovelain.com/corsproxy/';
 

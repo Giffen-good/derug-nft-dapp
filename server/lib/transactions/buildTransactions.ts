@@ -33,7 +33,7 @@ export const buildTransactions = async (
         tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
         tx.partialSign(...signers)
         transactions.push(tx.serialize({requireAllSignatures: false}).toString('base64'))
-        if (MAX_BURNS_PER_TX < transactions.length) break;
+        if (MAX_BURNS_PER_TX < transactions.length - 1) break;
     }
 
     return transactions;

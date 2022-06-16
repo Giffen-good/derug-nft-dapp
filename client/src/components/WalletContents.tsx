@@ -309,11 +309,7 @@ export function WalletContents(props: WalletContentProps) {
 
                     {burnCount > 0 && (
                         <>
-                            {burnCount > MAX_BURNS_PER_TX && !burning && (
-                                <div className={"text-red-500 text-sm "}>
-                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} swaps to complete this process.`}
-                                </div>
-                            )}
+
 
                             {acceptedDisclaimer && (
                                 <div>Initializing Swap.. </div>
@@ -323,10 +319,15 @@ export function WalletContents(props: WalletContentProps) {
                                     {statusMessage}
                                 </div>
                             )}
+                            {burnCount > MAX_BURNS_PER_TX && !burning && (
+                                <div className={"text-red-500 text-sm "}>
+                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} swaps to complete this process.`}
+                                </div>
+                            )}
                             <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16  akira'}
                                     onClick={confirmBurn}
                             >
-                                Burn
+                                SWAP
                             </button>
                         </>
                     )}
