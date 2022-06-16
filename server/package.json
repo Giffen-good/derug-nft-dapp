@@ -7,7 +7,7 @@
     "start": "ts-node ./app.ts",
     "start:prod": "npm run build && node ./dist/app.js",
     "start:nodemon": "./node_modules/nodemon/bin/nodemon.js",
-    "build": "npx tsc"
+    "build": "rimraf dist && tsc -p tsconfig.json"
   },
   "author": "",
   "license": "ISC",
@@ -22,7 +22,8 @@
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "lodash.chunk": "^4.2.0"
+    "lodash.chunk": "^4.2.0",
+    "rimraf": "^3.0.2"
   },
   "resolutions": {
     "@solana/spl-token": "0.2.0"
