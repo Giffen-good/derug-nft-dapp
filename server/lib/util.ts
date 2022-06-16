@@ -23,7 +23,7 @@ export const isMemberOfCollection = async (mintAddress: string) : Promise<Boolea
 export const getIpfsMetadataUrl = (tokenAddress: string, privateGateway: Boolean = false): string => {
     const hashmap = getHashmap();
     const pin = hashmap[tokenAddress];
-    return privateGateway ? `${process.env.PRIVATE_IPFS_GATEWAY_UR}${pin}` : `https://ipfs.infura.io/ipfs/${pin}`;
+    return privateGateway ? `${process.env.PRIVATE_IPFS_GATEWAY_URL}${pin}` : `https://ipfs.infura.io/ipfs/${pin}`;
 }
 interface UpdateAuthorityWallet {
     updateAuthorityWallet: NodeWallet;
