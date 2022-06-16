@@ -17,7 +17,7 @@ export const buildTransactions = async (
     connection,
     userPublicKey,
     nfts
-}: BuildTransactionParams): Promise<Buffer[]> => {
+}: BuildTransactionParams): Promise<string[]> => {
 
     const { updateAuthorityWallet, updateAuthorityKeypair } = getUpdateAuthorityWallet()
     let transactions = []
@@ -25,14 +25,15 @@ export const buildTransactions = async (
         const {mintIx, mint} = await createMintTx(connection, userPublicKey, updateAuthorityKeypair, nft)
         const burnIx = createBurnTx(nft, userPublicKey);
         const tx = new Transaction({ feePayer: userPublicKey }).add(
-            ...mintIx,
-            ...burnIx
+            ...burnIx,
+            ...mintIx
+
         )
         const signers = [updateAuthorityKeypair, mint];
 
         tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
         tx.partialSign(...signers)
-        transactions.push(tx.serialize({requireAllSignatures: false, verifySignatures:false}))
+        transactions.push(tx.serialize({requireAllSignatures: false}).toString('base64'))
     }
 
     return transactions;

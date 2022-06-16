@@ -11,7 +11,7 @@ import {RPC_URL} from "./lib/Constants";
 
 const app = express()
 const port = process.env.PORT || 8080
-const connection = new Connection(RPC_URL, "confirmed");
+const connection = new Connection(RPC_URL);
 
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -39,7 +39,7 @@ app.post('/createMintAndBurnIX', async (req: Request, res: Response) => {
     userPublicKey,
     nfts
   })
-  res.status(200).json(txs)
+  res.status(200).json({txs})
 })
 
 

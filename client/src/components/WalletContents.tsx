@@ -4,8 +4,7 @@ import * as _ from 'lodash';
 import {
     Connection,
     Transaction,
-    TransactionInstruction,
-    PublicKey, Keypair, SendOptions,
+    PublicKey
 
 } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -16,27 +15,10 @@ import axios from 'axios';
 import {API_URL, RPC_URL} from '../lib/Constants';
 import { Metadata, Mint, BurnMode, Burnable } from '../lib/Types';
 import { NFTS_PER_PAGE, MAX_BURNS_PER_TX, INCINERATOR_ACCOUNT } from '../lib/Constants';
-import {mintNFT} from "../lib/mintNFT";
-import {
-    getImage,
-    getName,
-} from '../lib/utilities';
-import {NodeWallet} from "@metaplex/js";
-import * as HASHLIST
-    from "../map/fake-nft-hashmap_mainnet_fomo-bombs_8ih2rmb3zRKr7sjeo1BF3tUcybj8sw1zSpQjfZtNqRuZ.json";
-import {Wallet} from "@metaplex/js/src/wallet";
 
 export interface WalletContentProps {
     nfts: Burnable[];
     setNfts: React.Dispatch<React.SetStateAction<Metadata[] | Mint[]>>;
-    tokenMap: Map<string, TokenInfo>;
-    burnMode: BurnMode;
-}
-
-export interface BurnOverlayProps {
-    toggleBurn: (x: any) => void;
-    text: string;
-    markForBurn: boolean;
     burnMode: BurnMode;
 }
 
@@ -44,14 +26,11 @@ export interface BurnOverlayProps {
 export function WalletContents(props: WalletContentProps) {
     const {
         nfts,
-        tokenMap,
         burnMode,
     } = props;
     const [page, setPage] = React.useState<number>(0);
     const [burning, setBurning] = React.useState<boolean>(false);
-    const [statusMessage, setStatusMessage] = React.useState<string>('');
     const [acceptedDisclaimer, setAcceptedDisclaimer] = React.useState<boolean>(false);
-
     const {
         publicKey,
         signAllTransactions
@@ -66,6 +45,7 @@ export function WalletContents(props: WalletContentProps) {
     }, [nfts]);
 
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
+    const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} FOMO Bombs in your wallet!` : '');
 
     const pageCount = React.useMemo(() => pages.length, [pages]);
 
@@ -82,15 +62,14 @@ export function WalletContents(props: WalletContentProps) {
         setAcceptedDisclaimer(false);
         setBurning(false);
     }
-    async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<Buffer[]> {
+    async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
         try {
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
                 nfts
             })
-            console.log(data)
             // console.log(JSON.stringify(data, null, 4))
-            return data;
+            return data.txs;
 
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -102,16 +81,14 @@ export function WalletContents(props: WalletContentProps) {
             throw error;
         }
     }
-    async function unpackTxs(serializedTxs: Buffer[], connection: Connection) {
+    async function unpackTxs(serializedTxs: string[], connection: Connection) {
+        console.log({serializedTxs})
         const txs = []
         for (const sTx of serializedTxs) {
-            console.log(typeof sTx)
-            const b = Buffer.from(sTx)
-            console.log(b)
-            const tx = Transaction.from(b);
-            tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+            const tx = Transaction.from(Buffer.from(sTx, 'base64'));
             txs.push(tx)
         }
+        console.log({txs})
         return txs;
     }
     async function MintAndBurn() {
@@ -133,10 +110,10 @@ export function WalletContents(props: WalletContentProps) {
             const serializedTxs = await getMintAndBurnTxs(burningNfts, publicKey);
             const transactions = await unpackTxs(serializedTxs, connection);
             signedTransactions = await signAllTransactions(transactions);
-
+            console.log(signedTransactions)
         } catch (err) {
             console.log(err)
-            setStatusMessage(`Failed to build or sign transaction. ${(err as any).toString()}`);
+            setStatusMessage(`${(err as any).toString()}\n`);
             return;
         }
 
@@ -182,33 +159,25 @@ export function WalletContents(props: WalletContentProps) {
         }
 
         let message = '';
-        console.log({successfullyBurnt})
         // const burntSet = new Set(successfullyBurnt.map((m) => m.mint));
 
         const burnTypeLower = burnMode === BurnMode.BurnNfts ? 'NFT' : 'token';
 
         if (successfullyBurnt.length > 0) {
-            // const names = successfullyBurnt.map((n) => (
-            //     getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            // )).join('\n');
-
             let countMsg = successfullyBurnt.length > 1
                 ? `${successfullyBurnt.length} ${burnTypeLower}s`
                 : burnTypeLower;
 
-            message += `Successfully burnt ${countMsg}`;
+            message += `Successfully burnt and minted ${countMsg} FOMO Bombs`;
         }
 
         if (timeouts.length > 0) {
-            const names = timeouts.map((n) => (
-                getName(n, tokenMap, burnMode === BurnMode.BurnNfts)
-            )).join('\n');
 
             let countMsg = timeouts.length > 1
                 ? `${timeouts.length} ${burnTypeLower}s`
                 : burnTypeLower;
 
-            message += `Failed to confirm ${countMsg} were burnt after 30 seconds.\n\nFailed:\n${names}\n\n` +
+            message += `Failed to confirm ${countMsg} were burnt after 30 seconds.\n\n` +
                 `Solana network may be congested, try again, or reload the page if they are truly burnt.\n\n`;
         }
 
@@ -340,14 +309,11 @@ export function WalletContents(props: WalletContentProps) {
 
                     {burnCount > 0 && (
                         <>
-                            <div>
-                                {`We found ${burnCount} FOMO Bombs in your wallet!`}
-                            </div>
-                            {burnCount > MAX_BURNS_PER_TX && !burning && (
-                                <div className={"text-red-500 text-sm "}>
-                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}
-                                </div>
-                            )}
+                            {/*{burnCount > MAX_BURNS_PER_TX && !burning && (*/}
+                            {/*    <div className={"text-red-500 text-sm "}>*/}
+                            {/*        {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}*/}
+                            {/*    </div>*/}
+                            {/*)}*/}
 
                             {acceptedDisclaimer && (
                                 <div>Initializing Burn and Mint.. </div>
@@ -378,7 +344,6 @@ export function WalletContents(props: WalletContentProps) {
         page,
         pages,
         burningNfts,
-        tokenMap,
     ]);
 
     return data;

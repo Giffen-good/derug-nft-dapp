@@ -13,20 +13,19 @@ import {
     createCreateMetadataAccountV2Instruction,
     createCreateMasterEditionV3Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl} from "../util";
+import {getMetadataPDA, getMasterEditionPDA} from "./util";
 import {utils} from "@metaplex/js";
-import {Burnable} from "../Types";
 
 interface MintIxRes {
     mintIx: TransactionInstruction[];
     mint: Keypair;
 }
-export const createMintTx = async (connection: Connection, userPublicKey: PublicKey, updateAuthorityKeypair: Keypair, nft: Burnable )
+export const createMintTx = async (connection: Connection, userPublicKey: PublicKey, updateAuthorityKeypair: Keypair )
     : Promise<MintIxRes> => {
     let mint = Keypair.generate();
     console.log(`mint: ${mint.publicKey.toBase58()}`);
     let ata = await getAssociatedTokenAddress(mint.publicKey, userPublicKey);
-    const ipfsURL = getIpfsMetadataUrl(nft.mint);
+    const ipfsURL = 'https://ipfs.infura.io/ipfs/bafkreihptpss2drygyaxmsui4nflcgxrajbavt5iwdnht22m5grx64v42m';
 
     const {
         name,
@@ -61,7 +60,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                         name,
                         symbol: symbol,
                         uri: ipfsURL,
-                        sellerFeeBasisPoints: 100,
+                        sellerFeeBasisPoints: 800,
                         creators: [
                             {
                                 address: updateAuthorityKeypair.publicKey,
