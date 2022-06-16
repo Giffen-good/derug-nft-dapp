@@ -30,7 +30,7 @@ interface UpdateAuthorityWallet {
     updateAuthorityKeypair: Keypair;
 }
 export const getUpdateAuthorityWallet = (): UpdateAuthorityWallet  => {
-    const walletSrc = `${global.__basedir}/${process.env.UPDATE_AUTHORITY_PATH}` || '';
+    const walletSrc = process.env.UPDATE_AUTHORITY_PATH || '';
     const secretKey = fs.readFileSync(
         walletSrc,
         "utf8"

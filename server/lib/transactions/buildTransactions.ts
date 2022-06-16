@@ -3,8 +3,6 @@ import {Burnable} from "../Types";
 import {createMintTx} from "./createMintTx";
 import { getUpdateAuthorityWallet} from "../util";
 import {createBurnTx} from "./createBurnTx";
-import chunk from 'lodash.chunk'
-import {MAX_BURNS_PER_TX} from "../Constants";
 
 export interface BuildTransactionParams {
     connection: Connection;
