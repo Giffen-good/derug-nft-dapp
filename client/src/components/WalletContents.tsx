@@ -64,6 +64,7 @@ export function WalletContents(props: WalletContentProps) {
     }
     async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
         try {
+            setStatusMessage('Building Transactions...')
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
                 nfts
@@ -141,6 +142,7 @@ export function WalletContents(props: WalletContentProps) {
         let errorMessages = [];
 
         for (const transaction of inProgressTransactions) {
+            if (MAX_BURNS_PER_TX) break
             const nft = burningNfts[i]
             console.log({transaction})
             const {
@@ -309,11 +311,11 @@ export function WalletContents(props: WalletContentProps) {
 
                     {burnCount > 0 && (
                         <>
-                            {/*{burnCount > MAX_BURNS_PER_TX && !burning && (*/}
-                            {/*    <div className={"text-red-500 text-sm "}>*/}
-                            {/*        {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}*/}
-                            {/*    </div>*/}
-                            {/*)}*/}
+                            {burnCount > MAX_BURNS_PER_TX && !burning && (
+                                <div className={"text-red-500 text-sm "}>
+                                    {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} transactions.`}
+                                </div>
+                            )}
 
                             {acceptedDisclaimer && (
                                 <div>Initializing Swap.. </div>
