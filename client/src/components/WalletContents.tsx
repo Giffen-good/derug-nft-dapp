@@ -61,7 +61,7 @@ export function WalletContents(props: WalletContentProps) {
     }
     async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
         try {
-            setStatusMessage('Building Transactions...')
+            setStatusMessage('Building Transactions - Please Wait...')
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
                 nfts
@@ -79,8 +79,7 @@ export function WalletContents(props: WalletContentProps) {
             throw error;
         }
     }
-    async function unpackTxs(serializedTxs: string[], connection: Connection) {
-        console.log({serializedTxs})
+    async function unpackTxs(serializedTxs: string[]) {
         const txs = []
         for (const sTx of serializedTxs) {
             const tx = Transaction.from(Buffer.from(sTx, 'base64'));
