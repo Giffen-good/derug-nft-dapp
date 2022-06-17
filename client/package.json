@@ -77,16 +77,16 @@
     "webpack": "^5.64.4",
     "webpack-dev-server": "^4.6.0",
     "webpack-manifest-plugin": "^4.0.2",
-    "workbox-webpack-plugin": "^6.4.1"
+    "workbox-webpack-plugin": "^6.4.1",
+    "postcss": "^8.4.14",
+    "autoprefixer": "^10.4.7"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
     "assert": "^2.0.0",
-    "autoprefixer": "^10.4.7",
     "buffer": "^6.0.3",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
-    "postcss": "^8.4.14",
     "process": "^0.11.10",
     "react-app-rewired": "^2.1.11",
     "stream-browserify": "^3.0.0",
