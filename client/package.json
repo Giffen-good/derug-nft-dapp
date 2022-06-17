@@ -23,7 +23,6 @@
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.11.39",
     "@types/react": "^18.0.12",
     "@types/react-dom": "^18.0.5",
     "axios": "^0.27.2",
@@ -79,6 +78,7 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "devDependencies": {
+    "@types/node": "^18.0.0",
     "assert": "^2.0.0",
     "autoprefixer": "^10.4.7",
     "buffer": "^6.0.3",
@@ -93,12 +93,14 @@
     "tailwindcss": "^3.1.2",
     "url": "^0.11.0"
   },
+  "browser": {
+    "crypto": false
+  },
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
-
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -151,7 +153,9 @@
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
     },
     "proxy": {
-    "*":{ "target" : "http://localhost:8080"}
+      "*": {
+        "target": "http://localhost:8080"
+      }
     },
     "moduleFileExtensions": [
       "web.js",
