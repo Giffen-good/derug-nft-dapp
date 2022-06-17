@@ -10,7 +10,7 @@ export const getHashlist =  (): string[] => {
     return Object.keys(hashmap)
 }
 export const getHashmap = (): Hashmap => {
-    const res = fs.readFileSync(`${global.__basedir}/${process.env.HASHTABLE_PATH}`,'utf8');
+    const res = fs.readFileSync(`${global.__basedir}/map/${process.env.HASHTABLE_PATH}`,'utf8');
     return JSON.parse(res)
 }
 
@@ -43,11 +43,18 @@ export const getUpdateAuthorityWallet = (): UpdateAuthorityWallet  => {
 
 }
 
-
-export const lengthInUtf8Bytes = (str: string) => {
-    // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-    var m = encodeURIComponent(str).match(/%[89ABab]/g);
-    return str.length + (m ? m.length : 0);
+interface Meta {
+    name: string;
+    symbol: string;
+    pin: string;
+}
+interface IpfsTable {
+    [key: string]: Meta
+}
+export const getIpfsMeta = (tokenAddress: string): Meta =>  {
+    const res = fs.readFileSync(`${global.__basedir}/map/meta-${process.env.HASHTABLE_PATH}`,'utf8');
+    const json: IpfsTable = JSON.parse(res)
+    return json[tokenAddress];
 }
 
 export async function getMetadataPDA(mint: PublicKey): Promise<PublicKey> {

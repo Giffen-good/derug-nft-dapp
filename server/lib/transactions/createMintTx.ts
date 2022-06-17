@@ -9,12 +9,10 @@ import {
     TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
-    PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
     createCreateMetadataAccountV2Instruction,
     createCreateMasterEditionV3Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl} from "../util";
-import {utils} from "@metaplex/js";
+import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl, getIpfsMeta} from "../util";
 import {Burnable} from "../Types";
 
 interface MintIxRes {
@@ -31,7 +29,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
     const {
         name,
         symbol,
-    } = await utils.metadata.lookup(getIpfsMetadataUrl(nft.mint, true));
+    } = getIpfsMeta(nft.mint)
 
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
