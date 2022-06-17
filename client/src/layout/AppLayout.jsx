@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Home from '../pages/Home'
-import GithubLogo from '../assets/github-logo.png'
+// import GithubLogo from '../assets/github-logo.png'
 const AppLayout = () => {
   return (
         <div style={{ minHeight: "100vh" }} className={'bg-green-fomo flex-col flex'}>
