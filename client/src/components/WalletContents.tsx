@@ -79,7 +79,7 @@ export function WalletContents(props: WalletContentProps) {
             throw error;
         }
     }
-    async function unpackTxs(serializedTxs: string[]) {
+    function unpackTxs(serializedTxs: string[]) {
         const txs = []
         for (const sTx of serializedTxs) {
             const tx = Transaction.from(Buffer.from(sTx, 'base64'));
@@ -104,7 +104,7 @@ export function WalletContents(props: WalletContentProps) {
         let signedTransactions = [];
         try {
             const serializedTxs = await getMintAndBurnTxs(burningNfts, publicKey);
-            const transactions = await unpackTxs(serializedTxs, connection);
+            const transactions = unpackTxs(serializedTxs);
             signedTransactions = await signAllTransactions(transactions);
             console.log(signedTransactions)
         } catch (err) {
