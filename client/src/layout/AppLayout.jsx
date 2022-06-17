@@ -12,7 +12,7 @@ const AppLayout = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
               </Routes>
-              <a target="_blank" rel="noreferrer"  className={'h-8 w-8 absolute bottom-4 right-4 z-20'} href={'https://github.com/Giffen-good/derug-nft-dapp'}><img alt={'github logo'} className={''} src={GithubLogo} /></a>
+              {/*<a target="_blank" rel="noreferrer"  className={'h-8 w-8 absolute bottom-4 right-4 z-20'} href={'https://github.com/Giffen-good/derug-nft-dapp'}><img alt={'github logo'} className={''} src={GithubLogo} /></a>*/}
           </main>
 
 

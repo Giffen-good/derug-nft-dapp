@@ -9,6 +9,12 @@ import path from 'path'
 import {buildTransactions} from "./lib/transactions/buildTransactions";
 import {Connection, PublicKey} from "@solana/web3.js";
 import {RPC_URL} from "./lib/Constants";
+import cors from 'cors';
+
+var corsOptions = {
+  origin: process.env.FRONTEND_PATH,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 const app = express()
 const port = process.env.PORT || 8080
@@ -18,6 +24,7 @@ const connection = new Connection(RPC_URL);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 global.__basedir = path.resolve(__dirname);
+app.use(cors(corsOptions))
 
 app.use(function(req: Request, res: Response, next: NextFunction) {
   res.header("Access-Control-Allow-Origin", process.env.FRONTEND_PATH); // update to match the domain you will make the request from

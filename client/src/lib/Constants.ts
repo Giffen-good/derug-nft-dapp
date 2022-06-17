@@ -7,7 +7,7 @@ export const METADATA_URL_BATCH_SIZE: number = 20;
 
 export const NFTS_PER_PAGE: number = 10;
 
-export const MAX_BURNS_PER_TX: number = 100;
+export const MAX_BURNS_PER_TX: number = 30;
 
 export const CORS_PROXY: string = 'https://letsalllovelain.com/corsproxy/';
 
