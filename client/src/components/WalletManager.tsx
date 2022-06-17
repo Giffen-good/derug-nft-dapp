@@ -68,8 +68,8 @@ export function WalletManager() {
         if (!publicKey) {
             return;
         }
-
         loadWalletContents(publicKey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [publicKey]);
 
 
