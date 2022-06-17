@@ -307,7 +307,7 @@ export function WalletContents(props: WalletContentProps) {
                         <>
 
                             {burnCount > MAX_BURNS_PER_TX && !burning && (
-                                <div className={"text-red-500 text-sm "}>
+                                <div style={{fontSize: '0.65rem'}} className={"text-red-500 text-sm "}>
                                     {`Due to Solana transaction size limits, you will need to approve ${Math.ceil(burnCount / MAX_BURNS_PER_TX)} swaps to complete this process.`}
                                 </div>
                             )}
