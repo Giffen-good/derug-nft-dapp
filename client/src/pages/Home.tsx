@@ -2,12 +2,11 @@ import {useConnection, useWallet} from "@solana/wallet-adapter-react";
 import { WalletManager } from "../components/WalletManager";
 import fomoImg from '../assets/fomo-bombs.png'
 const Home = () => {
-    const { connection } = useConnection();
     const { publicKey, connected } = useWallet();
     return (
         <>
             <div className={'flex-auto md:flex-1 h-full md:w-auto w-full'}>
-                <img src={fomoImg} className={'absolute bottom-0 max-w-full sm:max-w-[50%]'} />
+                <img alt={"A pfp of a FOMO Bomb"} src={fomoImg} className={'absolute bottom-0 max-w-full sm:max-w-[50%]'} />
             </div>
             <div className={' flex-auto md:flex-1 flex pt-10 sm:pt-0 sm:items-center z-10 max-w-full'}>
                 <div className={'heading-offset pr-4 mx-auto max-w-full w-full w-[650px]'}>

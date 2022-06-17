@@ -23,7 +23,7 @@ export function WalletManager() {
     const [statusText, setStatusText] = React.useState<string | null>(null);
 
     const [nfts, setNfts] = React.useState<Burnable[]>([]);
-    const [burnMode, setBurnMode] = React.useState<BurnMode>(BurnMode.BurnNfts);
+    const [burnMode] = React.useState<BurnMode>(BurnMode.BurnNfts);
 
     async function loadWalletContents(key: PublicKey) {
 

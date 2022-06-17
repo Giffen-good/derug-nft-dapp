@@ -8,13 +8,10 @@ import {
 
 } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import BN from 'bn.js';
-import { TokenInfo } from '@solana/spl-token-registry';
 import axios from 'axios';
 import {API_URL, RPC_URL} from '../lib/Constants';
 import { Metadata, Mint, BurnMode, Burnable } from '../lib/Types';
-import { NFTS_PER_PAGE, MAX_BURNS_PER_TX, INCINERATOR_ACCOUNT } from '../lib/Constants';
+import { NFTS_PER_PAGE, MAX_BURNS_PER_TX } from '../lib/Constants';
 
 export interface WalletContentProps {
     nfts: Burnable[];
@@ -89,7 +86,6 @@ export function WalletContents(props: WalletContentProps) {
             const tx = Transaction.from(Buffer.from(sTx, 'base64'));
             txs.push(tx)
         }
-        console.log({txs})
         return txs;
     }
     async function MintAndBurn() {
