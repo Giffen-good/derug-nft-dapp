@@ -55,7 +55,7 @@ export function WalletManager() {
             setStatusText,
         );
 
-        if (nftData.length !== nftData.length) {
+        if (nftData.length !== nftCount) {
             setNftCount(nftData.length);
         }
 

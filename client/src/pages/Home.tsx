@@ -1,4 +1,4 @@
-import {useConnection, useWallet} from "@solana/wallet-adapter-react";
+import {useWallet} from "@solana/wallet-adapter-react";
 import { WalletManager } from "../components/WalletManager";
 import fomoImg from '../assets/fomo-bombs.png'
 const Home = () => {
