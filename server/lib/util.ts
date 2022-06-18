@@ -3,6 +3,7 @@ import {Hashmap} from "./Types";
 import {Keypair, PublicKey} from "@solana/web3.js";
 import { NodeWallet } from '@metaplex/js'
 import {PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID} from '@metaplex-foundation/mpl-token-metadata';
+import bs58 from 'bs58'
 
 
 export const getHashlist =  (): string[] => {
@@ -30,15 +31,9 @@ interface UpdateAuthorityWallet {
     updateAuthorityKeypair: Keypair;
 }
 export const getUpdateAuthorityWallet = (): UpdateAuthorityWallet  => {
-    const walletSrc = process.env.UPDATE_AUTHORITY_PATH || '';
-    const secretKey = fs.readFileSync(
-        walletSrc,
-        "utf8"
-    );
-    const keypair = Keypair.fromSecretKey(
-        Buffer.from(JSON.parse(secretKey))
-    );
-
+    const secretKey = process.env.UA_SECRET || '';
+    const bytes = bs58.decode(secretKey);
+    const keypair = Keypair.fromSecretKey(bytes);
     return {updateAuthorityWallet: new NodeWallet(keypair), updateAuthorityKeypair: keypair}
 
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import dotenv from 'dotenv'
 dotenv.config();
-import express, {NextFunction} from 'express';
+import express from 'express';
 import { Request, Response } from 'express';
 import bodyParser from 'body-parser'
 import { getHashlist } from "./lib/util";
@@ -11,34 +11,44 @@ import {Connection, PublicKey} from "@solana/web3.js";
 import {RPC_URL} from "./lib/Constants";
 import cors from 'cors';
 
-var corsOptions = {
-  origin: process.env.FRONTEND_PATH,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+const options: cors.CorsOptions = {
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: process.env.API_URL,
+  preflightContinue: false,
+};
 
 const app = express()
 const port = process.env.PORT || 8080
-const connection = new Connection(RPC_URL);
+const connection = new Connection(RPC_URL,
+    {
+      httpHeaders: {
+        'Content-Type': 'application/json',
+        'Referer': 'https://fomo-bombs.chrisrock.ca'
+      }
+    });
 
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 global.__basedir = path.resolve(__dirname);
-app.use(cors(corsOptions))
+app.use(cors(options))
 
-app.use(function(req: Request, res: Response, next: NextFunction) {
-  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_PATH); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', cors(options), (req: Request, res: Response) => {
   res.send('FOMO or FUD!')
 })
 
 
 
-app.post('/createMintAndBurnIX', async (req: Request, res: Response) => {
+app.post('/createMintAndBurnIX', cors(options),  async (req: Request, res: Response) => {
   console.log('/createMintAndBurnIX');
   const { key, nfts } = req.body;
   const userPublicKey = new PublicKey(key)
