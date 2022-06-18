@@ -127,6 +127,7 @@ export function WalletContents(props: WalletContentProps) {
             );
         }
         if (inProgressTransactions.length > 1) {
+            setBurning(true)
             setStatusMessage(`Sent ${inProgressTransactions.length} burn transactions, confirming...`);
         } else {
             setStatusMessage(`Sent burn transaction, confirming...`);
@@ -321,12 +322,13 @@ export function WalletContents(props: WalletContentProps) {
                                     {statusMessage}
                                 </div>
                             )}
-
-                            <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16  akira'}
-                                    onClick={confirmBurn}
-                            >
-                                SWAP
-                            </button>
+                            {!burning && (
+                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16  akira'}
+                                        onClick={confirmBurn}
+                                >
+                                    SWAP
+                                </button>
+                            )}
                         </>
                     )}
                 </div>
