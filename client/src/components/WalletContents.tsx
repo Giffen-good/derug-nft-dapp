@@ -95,12 +95,12 @@ export function WalletContents(props: WalletContentProps) {
         setStatusMessage('');
 
 
-
+        console.log(RPC_URL)
         const connection = new Connection(RPC_URL, {
             confirmTransactionInitialTimeout: 30 * 1000,
             httpHeaders: {
                 'Content-Type': 'application/json',
-                'Referer': 'https://fomo-bombs.netlify.app'
+                'Referer': 'https://fomobombs.com'
             }
         });
         if (!publicKey) return
