@@ -13,6 +13,6 @@ export const TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 
 export const INCINERATOR_ACCOUNT = new PublicKey('burn68h9dS2tvZwtCFMt79SyaEgvqtcZZWJphizQxgt');
 
-export const MAX_BURNS_PER_TX: number = 30;
+export const MAX_BURNS_PER_TX: number = 10;
 
 export const WRAPPED_SOL: string = 'So11111111111111111111111111111111111111112';
