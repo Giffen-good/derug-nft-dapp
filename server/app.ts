@@ -21,7 +21,7 @@ const options: cors.CorsOptions = {
   ],
   credentials: true,
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: process.env.API_URL,
+  origin: 'https://fomobombs.com',
   preflightContinue: false,
 };
 
@@ -31,15 +31,15 @@ const connection = new Connection(RPC_URL,
     {
       httpHeaders: {
         'Content-Type': 'application/json',
-        'Referer': 'https://fomo-bombs.chrisrock.ca'
+        'Referer': 'https://api.fomobombs.com'
       }
     });
 
 //Here we are configuring express to use body-parser as middle-ware.
+app.use(cors(options))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 global.__basedir = path.resolve(__dirname);
-app.use(cors(options))
 
 
 app.get('/', cors(options), (req: Request, res: Response) => {

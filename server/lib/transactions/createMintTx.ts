@@ -59,7 +59,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                         name,
                         symbol: symbol,
                         uri: ipfsURL,
-                        sellerFeeBasisPoints: 100,
+                        sellerFeeBasisPoints: 800,
                         creators: [
                             {
                                 address: updateAuthorityKeypair.publicKey,
