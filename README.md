@@ -1,4 +1,4 @@
-# Derug NFT Dapp
+# Solana Derug NFT Dapp
 
 The purpose of this Dapp is to burn and mint a new copy of an NFT.
 
