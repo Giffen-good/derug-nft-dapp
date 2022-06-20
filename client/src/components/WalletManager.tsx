@@ -8,9 +8,9 @@ import {
     getTokenAccounts,
     getMetadataAddresses,
     getMetadataAccounts,
-} from '../lib/LoadWalletData';
-import { WalletLoadingAnimation } from './WalletLoadingAnimation';
-import { WalletContents } from './WalletContents';
+} from '../lib/utils';
+import { Loading } from './Loading';
+import { Swap } from './Swap';
 import { Burnable, BurnMode } from '../lib/Types';
 
 export function WalletManager() {
@@ -76,7 +76,7 @@ export function WalletManager() {
     const contents = React.useMemo(() => {
         if (burnMode === BurnMode.BurnNfts) {
             return (
-                <WalletContents
+                <Swap
                     nfts={nfts}
                     setNfts={(setNfts as any)}
                     burnMode={burnMode}
@@ -94,7 +94,7 @@ export function WalletManager() {
 
     if (loading) {
         return (
-            <WalletLoadingAnimation
+            <Loading
                 nftCount={nftCount}
                 statusText={statusText}
             />

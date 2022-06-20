@@ -1,5 +1,4 @@
 import React from 'react';
-import * as _ from 'lodash';
 
 import {
     Connection,
@@ -11,7 +10,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import axios from 'axios';
 import {API_URL, RPC_URL} from '../lib/Constants';
 import { Metadata, Mint, BurnMode, Burnable } from '../lib/Types';
-import { NFTS_PER_PAGE, MAX_BURNS_PER_TX } from '../lib/Constants';
+import { MAX_BURNS_PER_TX } from '../lib/Constants';
 
 export interface WalletContentProps {
     nfts: Burnable[];
@@ -20,12 +19,11 @@ export interface WalletContentProps {
 }
 
 
-export function WalletContents(props: WalletContentProps) {
+export function Swap(props: WalletContentProps) {
     const {
         nfts,
         burnMode,
     } = props;
-    const [page, setPage] = React.useState<number>(0);
     const [burning, setBurning] = React.useState<boolean>(false);
     const [acceptedDisclaimer, setAcceptedDisclaimer] = React.useState<boolean>(false);
     const {
@@ -33,9 +31,6 @@ export function WalletContents(props: WalletContentProps) {
         signAllTransactions
     } = useWallet();
 
-    const pages = React.useMemo(() => {
-        return _.chunk(nfts, NFTS_PER_PAGE);
-    }, [nfts]);
 
     const burningNfts = React.useMemo(() => {
         return nfts.filter((n) => n.markForBurn);
@@ -43,12 +38,6 @@ export function WalletContents(props: WalletContentProps) {
 
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
     const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} FOMO Bombs in your wallet!` : '');
-
-    const pageCount = React.useMemo(() => pages.length, [pages]);
-
-    React.useEffect(() => {
-        setPage(0);
-    }, [pageCount]);
 
     React.useEffect(() => {
         onBurnComplete();
@@ -337,13 +326,10 @@ export function WalletContents(props: WalletContentProps) {
         // eslint-disable-next-line
     }, [
         burning,
-        pageCount,
         acceptedDisclaimer,
         burnCount,
         statusMessage,
         burnMode,
-        page,
-        pages,
         burningNfts,
     ]);
 

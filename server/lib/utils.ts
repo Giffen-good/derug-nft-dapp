@@ -4,22 +4,17 @@ import {Keypair, PublicKey} from "@solana/web3.js";
 import { NodeWallet } from '@metaplex/js'
 import {PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID} from '@metaplex-foundation/mpl-token-metadata';
 import bs58 from 'bs58'
-
+import {HASHMAP_FILE} from './Constants'
 
 export const getHashlist =  (): string[] => {
     const hashmap = getHashmap();
     return Object.keys(hashmap)
 }
 export const getHashmap = (): Hashmap => {
-    const res = fs.readFileSync(`${global.__basedir}/map/${process.env.HASHTABLE_PATH}`,'utf8');
+    const res = fs.readFileSync(`${global.__basedir}/map/${HASHMAP_FILE}`,'utf8');
     return JSON.parse(res)
 }
 
-export const isMemberOfCollection = async (mintAddress: string) : Promise<Boolean> => {
-    const hashlist = getHashlist();
-    return hashlist.includes(mintAddress);
-
-}
 
 export const getIpfsMetadataUrl = (tokenAddress: string, privateGateway: Boolean = false): string => {
     const hashmap = getHashmap();
@@ -46,8 +41,12 @@ interface Meta {
 interface IpfsTable {
     [key: string]: Meta
 }
+
 export const getIpfsMeta = (tokenAddress: string): Meta =>  {
-    const res = fs.readFileSync(`${global.__basedir}/map/meta-${process.env.HASHTABLE_PATH}`,'utf8');
+    console.log(`${global.__basedir}/map/meta-${HASHMAP_FILE}`)
+    const res = fs.readFileSync(`${global.__basedir}/map/meta-${HASHMAP_FILE}`,'utf8');
+    console.log(res)
+    console.log(tokenAddress)
     const json: IpfsTable = JSON.parse(res)
     return json[tokenAddress];
 }

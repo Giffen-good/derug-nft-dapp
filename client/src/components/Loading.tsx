@@ -5,7 +5,7 @@ export interface WalletLoadingProps {
     statusText: string | null;
 }
 
-export function WalletLoadingAnimation(props: WalletLoadingProps) {
+export function Loading(props: WalletLoadingProps) {
     const {
         statusText,
     } = props;

@@ -12,7 +12,7 @@ import {
     createCreateMetadataAccountV2Instruction,
     createCreateMasterEditionV3Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl, getIpfsMeta} from "../util";
+import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl, getIpfsMeta} from "../utils";
 import {Burnable} from "../Types";
 
 interface MintIxRes {
@@ -34,6 +34,20 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
 
+    const creators = [
+            {
+                address: updateAuthorityKeypair.publicKey,
+                verified: true,
+                share: 100,
+            }
+        ]
+    if (updateAuthorityKeypair.publicKey.toString() !== userPublicKey.toString()) {
+        creators.push({
+            address: userPublicKey,
+            verified: false,
+            share: 0,
+        },)
+    }
     let mintIx = [
         SystemProgram.createAccount({
             fromPubkey: userPublicKey,
@@ -60,18 +74,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                         symbol: symbol,
                         uri: ipfsURL,
                         sellerFeeBasisPoints: 800,
-                        creators: [
-                            {
-                                address: updateAuthorityKeypair.publicKey,
-                                verified: true,
-                                share: 100,
-                            },
-                            {
-                                address: userPublicKey,
-                                verified: false,
-                                share: 0,
-                            },
-                        ],
+                        creators,
                         collection: null,
                         uses: null,
                     },

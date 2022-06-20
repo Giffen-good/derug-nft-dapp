@@ -4,11 +4,11 @@ dotenv.config();
 import express from 'express';
 import { Request, Response } from 'express';
 import bodyParser from 'body-parser'
-import { getHashlist } from "./lib/util";
+import { getHashlist } from "./lib/utils";
 import path from 'path'
 import {buildTransactions} from "./lib/transactions/buildTransactions";
 import {Connection, PublicKey} from "@solana/web3.js";
-import {RPC_URL} from "./lib/Constants";
+import {RPC_URL, CLIENT_URL } from "./lib/Constants";
 import cors from 'cors';
 
 const options: cors.CorsOptions = {
@@ -21,29 +21,23 @@ const options: cors.CorsOptions = {
   ],
   credentials: true,
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: 'https://fomobombs.com',
+  origin: CLIENT_URL,
   preflightContinue: false,
 };
 
 const app = express()
 const port = process.env.PORT || 8080
-const connection = new Connection(RPC_URL,
-    {
-      httpHeaders: {
-        'Content-Type': 'application/json',
-        'Referer': 'https://api.fomobombs.com'
-      }
-    });
+const connection = new Connection(RPC_URL);
 
 //Here we are configuring express to use body-parser as middle-ware.
-app.use(cors(options))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 global.__basedir = path.resolve(__dirname);
+app.use(cors(options))
 
 
 app.get('/', cors(options), (req: Request, res: Response) => {
-  res.send('FOMO or FUD!')
+  res.send('Congratulations on making it to this point. Please claim your reward: https://tinyurl.com/39hbjcyf')
 })
 
 

@@ -1,7 +1,7 @@
 import {Connection, PublicKey, Transaction} from "@solana/web3.js";
 import {Burnable} from "../Types";
 import {createMintTx} from "./createMintTx";
-import { getUpdateAuthorityWallet} from "../util";
+import { getUpdateAuthorityWallet} from "../utils";
 import {createBurnTx} from "./createBurnTx";
 import {MAX_BURNS_PER_TX} from "../Constants";
 
@@ -18,7 +18,7 @@ export const buildTransactions = async (
     nfts
 }: BuildTransactionParams): Promise<string[]> => {
 
-    const { updateAuthorityWallet, updateAuthorityKeypair } = getUpdateAuthorityWallet()
+    const { updateAuthorityKeypair } = getUpdateAuthorityWallet()
     let transactions = []
     for (const nft of nfts) {
         const {mintIx, mint} = await createMintTx(connection, userPublicKey, updateAuthorityKeypair, nft)

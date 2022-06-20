@@ -2,39 +2,17 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import * as _ from 'lodash';
 
-import { Mint, Metadata, MetadataURL, MetadataAddress } from './Types';
+import { Mint, MetadataURL, MetadataAddress } from './Types';
 import {
     METADATA_ADDRESS_BATCH_SIZE,
     METADATA_ACCOUNT_BATCH_SIZE,
-    METADATA_URL_BATCH_SIZE,
-    CORS_PROXY,
-    WRAPPED_SOL, API_URL,
+    WRAPPED_SOL, API_URL, METADATA_PROGRAM,
 } from './Constants';
 import { decodeMetadata } from './metaplex/metadata';
-import { fetchWithRetry } from './utilities';
 import React from "react";
 import axios from "axios";
 
 
-
-// export async function getMintList(): Promise<string> {
-//     try {
-//         const { data } = await axios.get<string>(API_URL + '/getMintList')
-//         console.log(data)
-//         // console.log(JSON.stringify(data, null, 4))
-//         return data;
-//
-//     } catch (error) {
-//         if (axios.isAxiosError(error)) {
-//             console.log('error message: ', error.message);
-//             // 👇️ error: AxiosError<any, any>
-//             return error.message;
-//         } else {
-//             console.log('unexpected error: ', error);
-//             return 'An unexpected error occurred';
-//         }
-//     }
-// }
 /* Some inspiration taken from
  * https://github.com/NftEyez/sol-rayz/blob/main/packages/sol-rayz/src/getParsedNftAccountsByOwner.ts */
 export async function getTokenAccounts(connection: Connection, publicKey: PublicKey): Promise<Mint[]> {
@@ -73,7 +51,6 @@ export async function getTokenAccounts(connection: Connection, publicKey: Public
             return nftAccounts;
         } catch (err) {
             console.log(err);
-            continue;
         }
     }
 }
@@ -120,16 +97,15 @@ export async function getMetadataAddresses(
     return addresses;
 }
 
-const metadataProgram = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 
 async function getMetadataAddress(mint: Mint): Promise<MetadataAddress> {
     const address = (await PublicKey.findProgramAddress(
             [
                 Buffer.from('metadata'),
-                metadataProgram.toBuffer(),
+                METADATA_PROGRAM.toBuffer(),
                 new PublicKey(mint.mint).toBuffer(),
             ],
-            metadataProgram,
+            METADATA_PROGRAM,
         )
     )[0];
 
@@ -187,7 +163,6 @@ async function getMetadataAccountChunk(
                         setStatusText(`Loaded ${result.data.name} account...`);
                     } catch (err) {
                         console.log(err);
-                        continue;
                     }
                 }
             }
@@ -195,7 +170,6 @@ async function getMetadataAccountChunk(
             return metadata;
         } catch (err) {
             console.log(err);
-            continue;
         }
     }
 }
@@ -239,153 +213,4 @@ export async function getMetadataAccounts(
     }
 
     return accounts;
-}
-
-async function fetchMetadataURL(
-    url: MetadataURL,
-    setStatusText: React.Dispatch<React.SetStateAction<string | null>>,
-    setNftsLoaded: React.Dispatch<React.SetStateAction<number>>,
-): Promise<{ success: boolean, data: MetadataURL }> {
-    console.log(`Fetching metadata for ${url.mint}, URL: ${url.url}...`);
-
-    if (!url.url) {
-        return { success: false, data: {
-                mint: url.mint,
-                count: url.count,
-                tokenAcc: url.tokenAcc,
-                name: url.name,
-                symbol: url.symbol,
-                markForBurn: true,
-                uiAmount: url.uiAmount,
-                burnt: false,
-            }};
-    }
-
-    let endpoint = CORS_PROXY + url.url;
-
-    const validEndpoints = [
-        'arweave.net',
-        'https://testlaunchmynft',
-        'ipfs.dweb.link',
-    ];
-
-    for (const permitted of validEndpoints) {
-        if (url.url.includes(permitted)) {
-            endpoint = url.url;
-            break;
-        }
-    }
-
-    if (url.url !== endpoint) {
-        console.log(`Non arweave URL: ${url.url}`);
-    }
-
-    const {
-        success,
-        data,
-        error,
-    } = await fetchWithRetry(
-        endpoint,
-    );
-
-    if (success && data) {
-        console.log(`Successfully fetched metadata for ${data.name}...`);
-
-        setStatusText(`Loaded ${data.name} metadata...`);
-        setNftsLoaded((c) => c+1);
-
-        return {
-            success: true,
-            data: {
-                mint: url.mint,
-                count: url.count,
-                tokenAcc: url.tokenAcc,
-                name: url.name,
-                symbol: url.symbol,
-                markForBurn: true,
-                uiAmount: url.uiAmount,
-                ...data,
-            },
-        };
-    } else if (error) {
-        console.log(`Failed to fetch metadata for ${url.mint}: ${error.toString()}`);
-    }
-
-    return { success: false, data: {
-            mint: url.mint,
-            count: url.count,
-            tokenAcc: url.tokenAcc,
-            name: url.name,
-            symbol: url.symbol,
-            markForBurn: true,
-            burnt: false,
-            uiAmount: url.uiAmount,
-        }};
-}
-
-function sortMetadata(a: Metadata, b: Metadata) {
-    if (!a.collection || !a.collection.name) {
-        return 1;
-    }
-
-    if (!b.collection || !b.collection.name) {
-        return -1;
-    }
-
-    if (a.collection.name !== b.collection.name) {
-        return a.collection.name.localeCompare(b.collection.name);
-    }
-
-    return a.name.localeCompare(b.name);
-}
-
-export async function getMetadata(
-    metadataURLs: MetadataURL[],
-    setStatusText: React.Dispatch<React.SetStateAction<string | null>>,
-    setNftsLoaded: React.Dispatch<React.SetStateAction<number>>,
-) {
-    let metadata: Metadata[] = [];
-    const tokens = [];
-
-    for (let i = 0; i < metadataURLs.length / METADATA_URL_BATCH_SIZE; i++) {
-        const itemsRemaining = Math.min(METADATA_URL_BATCH_SIZE, metadataURLs.length - i * METADATA_URL_BATCH_SIZE);
-
-        const processing: any[] = [];
-
-        for (let j = 0; j < itemsRemaining; j++) {
-            const item = i * METADATA_URL_BATCH_SIZE + j;
-
-            const url = metadataURLs[item];
-
-            processing.push(fetchMetadataURL(url, setStatusText, setNftsLoaded));
-        }
-
-        const results = await Promise.allSettled(processing);
-
-        console.log(`Got ${results.length} results`);
-
-        const successful = results.filter((res) => {
-            if (res.status !== 'fulfilled') {
-                console.log(res.reason);
-            }
-
-            return res.status === 'fulfilled';
-            // eslint-disable-next-line no-loop-func
-        }).map((res) => {
-            return (res as PromiseFulfilledResult<any>).value;
-        });
-
-        for (const result of successful) {
-            if (result.success) {
-                metadata.push(result.data);
-            } else {
-                tokens.push(result.data);
-            }
-        }
-    }
-
-    return {
-        nfts: metadata.sort(sortMetadata),
-        tokens,
-    };
 }
