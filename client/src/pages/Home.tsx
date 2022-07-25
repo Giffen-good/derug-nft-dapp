@@ -13,7 +13,7 @@ const Home = () => {
                 </div>
             </div>
             <div className={'flex-auto md:flex-1 h-full md:w-auto w-full'}>
-                <img alt={"A pfp of a FOMO Bomb"} src={pfp} className={'pfp absolute bottom-0 max-w-full sm:max-w-[50%]'} />
+                <img alt={"A pfp of a Brave Cat"} src={pfp} className={'pfp absolute bottom-0 max-w-full sm:max-w-[50%]'} />
             </div>
         </>
     )
