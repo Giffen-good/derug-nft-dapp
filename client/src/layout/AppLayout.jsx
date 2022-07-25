@@ -6,7 +6,7 @@ const AppLayout = () => {
   return (
         <div style={{ minHeight: "100vh" }} className={' flex-col flex'}>
           <header className={'flex justify-end m-8 relative'}>
-                <img className={'logo'} src={Logo} />
+                <img alt={'Brave Cats Society logo'} className={'logo'} src={Logo} />
                 <WalletMultiButton className="wallet-button" />
           </header>
           <main className={'flex-1 relative flex'}>
