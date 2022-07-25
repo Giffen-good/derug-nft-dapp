@@ -11,6 +11,7 @@ import {
 import {
     createCreateMetadataAccountV2Instruction,
     createCreateMasterEditionV3Instruction,
+    createSetAndVerifyCollectionInstruction
 } from "@metaplex-foundation/mpl-token-metadata";
 import {getMetadataPDA, getMasterEditionPDA, getIpfsMetadataUrl, getIpfsMeta} from "../utils";
 import {Burnable} from "../Types";
@@ -34,6 +35,10 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
 
+    const collectionMint = new PublicKey('');
+    let collectionMetadataPubkey = await getMetadataPDA(collectionMint);
+    let collectionMasterEditionPubkey =  await getMasterEditionPDA(collectionMint);
+
     const creators = [
             {
                 address: updateAuthorityKeypair.publicKey,
@@ -48,6 +53,8 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
             share: 0,
         },)
     }
+
+
     let mintIx = [
         SystemProgram.createAccount({
             fromPubkey: userPublicKey,
@@ -82,6 +89,15 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                 },
             }
         ),
+        // createSetAndVerifyCollectionInstruction({
+        //     collection: collectionMetadataPubkey,
+        //     collectionAuthority: updateAuthorityKeypair.publicKey,
+        //     collectionMasterEditionAccount: collectionMasterEditionPubkey,
+        //     collectionMint: collectionMint,
+        //     metadata: tokenMetadataPubkey,
+        //     payer: userPublicKey,
+        //     updateAuthority: updateAuthorityKeypair.publicKey
+        // }),
         createCreateMasterEditionV3Instruction(
             {
                 edition: masterEditionPubkey,

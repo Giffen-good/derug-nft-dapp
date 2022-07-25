@@ -1,11 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Logo from '../assets/logo.jpg'
 import Home from '../pages/Home'
-// import GithubLogo from '../assets/github-logo.png'
 const AppLayout = () => {
   return (
-        <div style={{ minHeight: "100vh" }} className={'bg-green-fomo flex-col flex'}>
-          <header className={'flex justify-end p-8'}>
+        <div style={{ minHeight: "100vh" }} className={' flex-col flex'}>
+          <header className={'flex justify-end m-8 relative'}>
+                <img className={'logo'} src={Logo} />
                 <WalletMultiButton className="wallet-button" />
           </header>
           <main className={'flex-1 relative flex'}>

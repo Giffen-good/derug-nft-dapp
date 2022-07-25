@@ -37,7 +37,7 @@ export function Swap(props: WalletContentProps) {
     }, [nfts]);
 
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
-    const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} FOMO Bombs in your wallet!` : '');
+    const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} Brave Cats in your wallet!` : '');
 
     React.useEffect(() => {
         onBurnComplete();
@@ -88,7 +88,7 @@ export function Swap(props: WalletContentProps) {
             confirmTransactionInitialTimeout: 30 * 1000,
             httpHeaders: {
                 'Content-Type': 'application/json',
-                'Referer': 'https://fomobombs.com'
+                'Referer': 'https://bravecats.com'
             }
         });
         if (!publicKey) return
@@ -157,7 +157,7 @@ export function Swap(props: WalletContentProps) {
                 ? `${successfullyBurnt.length} ${burnTypeLower}s`
                 : burnTypeLower;
 
-            message += `Successfully Swapped ${countMsg} FOMO Bombs`;
+            message += `Successfully Swapped ${countMsg} Brave Cats`;
         }
 
         if (timeouts.length > 0) {
@@ -284,7 +284,7 @@ export function Swap(props: WalletContentProps) {
             return (
                 <div>
                     <span>
-                        {`No FOMO Bombs found! Ensure you have the correct wallet selected.`}
+                        {`No Brave Cats found! Ensure you have the correct wallet selected.`}
                     </span>
                 </div>
             )
