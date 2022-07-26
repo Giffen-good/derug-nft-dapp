@@ -9,9 +9,6 @@ export interface Burnable {
     uiAmount: number;
 }
 
-export interface Hashmap {
-    [key: string]: string
-}
 export interface createMasterEditionV3InstructionParams {
     updateAuthorityPublicKey: PublicKey;
     mint: PublicKey;
