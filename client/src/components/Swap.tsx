@@ -312,7 +312,7 @@ export function Swap(props: WalletContentProps) {
                                 </div>
                             )}
                             {!burning && (
-                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16 hanson'}
+                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
                                         onClick={confirmBurn}
                                 >
                                     SWAP
