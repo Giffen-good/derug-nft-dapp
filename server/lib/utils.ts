@@ -16,8 +16,7 @@ export const getHashmap = (): IpfsTable => {
 
 
 export const getIpfsMetadataUrl = (tokenAddress: string, privateGateway: Boolean = false): string => {
-    const hashmap = getHashmap();
-    const pin = hashmap[tokenAddress].pin;
+    const { pin } = getIpfsMeta(tokenAddress);
     return privateGateway ? `${process.env.PRIVATE_IPFS_GATEWAY_URL}${pin}` : `https://ipfs.infura.io/ipfs/${pin}`;
 }
 interface UpdateAuthorityWallet {
@@ -44,7 +43,6 @@ interface IpfsTable {
 export const getIpfsMeta = (tokenAddress: string): Meta =>  {
     console.log(`${global.__basedir}/map/${HASHMAP_FILE}`)
     const res = fs.readFileSync(`${global.__basedir}/map/${HASHMAP_FILE}`,'utf8');
-    console.log(res)
     console.log(tokenAddress)
     const json: IpfsTable = JSON.parse(res)
     return json[tokenAddress];
