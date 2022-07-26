@@ -27,6 +27,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.hanson {
+  font-family: 'Hanson';
+}
 .logo {
   position:absolute;
   top:50%;
@@ -70,6 +73,7 @@ button.wallet-adapter-button:not([disabled]):hover {
     padding-left:2rem;
   }
   .pfp {
+    z-index: -1;
     right:0;
   }
 }

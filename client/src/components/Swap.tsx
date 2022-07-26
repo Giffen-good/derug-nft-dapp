@@ -37,7 +37,7 @@ export function Swap(props: WalletContentProps) {
     }, [nfts]);
 
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
-    const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} Brave Cats in your wallet!` : '');
+    const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} Brave ${burnCount > 1 ? 'Cats' : 'Cat'} in your wallet!` : '');
 
     React.useEffect(() => {
         onBurnComplete();
@@ -291,7 +291,7 @@ export function Swap(props: WalletContentProps) {
         }
 
         return (
-            <div>
+            <div className={'akira'}>
                 <div>
 
 
@@ -312,7 +312,7 @@ export function Swap(props: WalletContentProps) {
                                 </div>
                             )}
                             {!burning && (
-                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16  akira'}
+                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16 hanson'}
                                         onClick={confirmBurn}
                                 >
                                     SWAP
