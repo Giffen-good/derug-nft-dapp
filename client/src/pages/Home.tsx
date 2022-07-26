@@ -7,8 +7,8 @@ const Home = () => {
         <>
 
             <div className={' flex-auto md:flex-1 flex pt-10 sm:pt-0 sm:items-center z-10 max-w-full'}>
-                <div className={'heading-offset pr-4 mx-auto max-w-full w-full max-w-[650px] swap-heading'}>
-                    <h1 className={`uppercase  sm:text-4xl md:text-6xl md:whitespace-nowrap md:pl-8`}>The SWAP</h1>
+                <div className={'heading-offset md:pl-8 pr-4 mx-auto max-w-full w-full max-w-[650px] swap-heading'}>
+                    <h1 className={`uppercase  sm:text-4xl md:text-6xl md:whitespace-nowrap `}>The SWAP</h1>
                     {connected && publicKey ? <WalletManager /> : <h2 className={""}>Please Connect your wallet to begin.</h2>}
                 </div>
             </div>

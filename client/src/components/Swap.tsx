@@ -38,7 +38,7 @@ export function Swap(props: WalletContentProps) {
 
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
     const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} Brave ${burnCount > 1 ? 'Cats' : 'Cat'} in your wallet!` : '');
-
+    const [burnComplete, setBurnComplete] = React.useState<boolean>(false)
     React.useEffect(() => {
         onBurnComplete();
     }, [burnMode]);
@@ -46,6 +46,7 @@ export function Swap(props: WalletContentProps) {
 
     async function onBurnComplete() {
         setAcceptedDisclaimer(false);
+        setBurnComplete(true)
         setBurning(false);
     }
     async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
@@ -153,11 +154,8 @@ export function Swap(props: WalletContentProps) {
         const burnTypeLower = burnMode === BurnMode.BurnNfts ? 'NFT' : 'token';
 
         if (successfullyBurnt.length > 0) {
-            let countMsg = successfullyBurnt.length > 1
-                ? `${successfullyBurnt.length} ${burnTypeLower}s`
-                : burnTypeLower;
-
-            message += `Successfully Swapped ${countMsg} Brave Cats`;
+           
+            message += `Successfully Swapped ${successfullyBurnt.length} Brave ${successfullyBurnt.length > 1 ? 'Cats' : 'Cat'}`;
         }
 
         if (timeouts.length > 0) {
@@ -270,6 +268,30 @@ export function Swap(props: WalletContentProps) {
         setBurning(false);
     }
 
+    const refreshPage = () => {
+        window.location.reload()
+    }
+    const BurnButton = () => {
+        if (burnComplete && burnCount > MAX_BURNS_PER_TX) {
+            return (
+                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
+                        onClick={refreshPage}
+                >
+                    SWAP MORE
+                </button>
+            )
+        } else if (burnComplete) {
+            return <div></div>
+        } else {
+            return (
+                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
+                        onClick={confirmBurn}
+                >
+                    SWAP
+                </button>
+            )
+        }
+    }
     React.useEffect(() => {
         if (acceptedDisclaimer) {
             handleBurn();
@@ -312,11 +334,7 @@ export function Swap(props: WalletContentProps) {
                                 </div>
                             )}
                             {!burning && (
-                                <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
-                                        onClick={confirmBurn}
-                                >
-                                    SWAP
-                                </button>
+                                <BurnButton />
                             )}
                         </>
                     )}
