@@ -35,7 +35,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
 
-    const collectionMint = new PublicKey('');
+    const collectionMint = new PublicKey('BLNmoLJsZSbZiZ8VbQEdCrCEeE61xL9MvHQC5kahXWwB');
     let collectionMetadataPubkey = await getMetadataPDA(collectionMint);
     let collectionMasterEditionPubkey =  await getMasterEditionPDA(collectionMint);
 
@@ -89,15 +89,15 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                 },
             }
         ),
-        // createSetAndVerifyCollectionInstruction({
-        //     collection: collectionMetadataPubkey,
-        //     collectionAuthority: updateAuthorityKeypair.publicKey,
-        //     collectionMasterEditionAccount: collectionMasterEditionPubkey,
-        //     collectionMint: collectionMint,
-        //     metadata: tokenMetadataPubkey,
-        //     payer: userPublicKey,
-        //     updateAuthority: updateAuthorityKeypair.publicKey
-        // }),
+        createSetAndVerifyCollectionInstruction({
+            collection: collectionMetadataPubkey,
+            collectionAuthority: updateAuthorityKeypair.publicKey,
+            collectionMasterEditionAccount: collectionMasterEditionPubkey,
+            collectionMint: collectionMint,
+            metadata: tokenMetadataPubkey,
+            payer: userPublicKey,
+            updateAuthority: updateAuthorityKeypair.publicKey
+        }),
         createCreateMasterEditionV3Instruction(
             {
                 edition: masterEditionPubkey,
