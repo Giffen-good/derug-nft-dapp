@@ -18,6 +18,7 @@
                             'embedded-opentype', and 'svg' */
 }
 body {
+  background-color:#fff;
   max-width:100%;
   overflow:hidden;
   margin: 0;
@@ -63,6 +64,9 @@ button.wallet-adapter-button:not([disabled]):hover {
 .heading-offset {
   padding-bottom:112px;
 }
+.pfp {
+  z-index:-10;
+}
 @media screen and (max-width: 769px) {
   .swap-heading {
     position: absolute;
@@ -73,7 +77,6 @@ button.wallet-adapter-button:not([disabled]):hover {
     padding-left:2rem;
   }
   .pfp {
-    z-index: -10;
     right:0;
   }
 }
