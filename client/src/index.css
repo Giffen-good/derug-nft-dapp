@@ -73,7 +73,7 @@ button.wallet-adapter-button:not([disabled]):hover {
     padding-left:2rem;
   }
   .pfp {
-    z-index: -1;
+    z-index: -10;
     right:0;
   }
 }

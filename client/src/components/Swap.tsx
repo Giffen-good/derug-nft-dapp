@@ -154,7 +154,7 @@ export function Swap(props: WalletContentProps) {
         const burnTypeLower = burnMode === BurnMode.BurnNfts ? 'NFT' : 'token';
 
         if (successfullyBurnt.length > 0) {
-           
+
             message += `Successfully Swapped ${successfullyBurnt.length} Brave ${successfullyBurnt.length > 1 ? 'Cats' : 'Cat'}`;
         }
 
