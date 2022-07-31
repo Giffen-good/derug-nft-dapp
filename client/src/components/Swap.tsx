@@ -272,7 +272,7 @@ export function Swap(props: WalletContentProps) {
         window.location.reload()
     }
     const BurnButton = () => {
-        if (burnComplete && burnCount > MAX_BURNS_PER_TX) {
+        if (burnComplete && !burning && burnCount > MAX_BURNS_PER_TX) {
             return (
                 <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
                         onClick={refreshPage}
