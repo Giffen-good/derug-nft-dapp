@@ -70,6 +70,7 @@ export function Swap(props: WalletContentProps) {
         const txs = []
         for (const sTx of serializedTxs) {
             const tx = Transaction.from(Buffer.from(sTx, 'base64'));
+            console.log({tx})
             txs.push(tx)
         }
         return txs;
@@ -86,7 +87,7 @@ export function Swap(props: WalletContentProps) {
             confirmTransactionInitialTimeout: 30 * 1000,
             httpHeaders: {
                 'Content-Type': 'application/json',
-                'Referer': 'https://bravecats.com'
+                'Referer': 'https://bravecatsociety.com'
             }
         });
         if (!publicKey) return
@@ -325,7 +326,7 @@ export function Swap(props: WalletContentProps) {
                             )}
                             {statusMessage !== '' && (
                                 <div>
-                                    {statusMessage.split('\n').map((str,n) => <p className={`mt-4 ${n > 0 ? 'text-left': ''}`}>{str}</p>)}
+                                    {statusMessage.split('\n').map((str,n) => <p key={n} className={`mt-4 ${n > 0 ? 'text-left': ''}`}>{str}</p>)}
                                 </div>
                             )}
                             {!burning && (
