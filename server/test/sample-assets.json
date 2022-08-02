@@ -1,0 +1,27 @@
+[
+  {
+    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/0.json",
+    "name": "Sample PEPE for SWAP #00",
+    "symbol": "PEPE"
+  },
+  {
+    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/1.json",
+    "name": "Sample PEPE for SWAP #01",
+    "symbol": "PEPE"
+  },
+  {
+    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/2.json",
+    "name": "Sample PEPE for SWAP #02",
+    "symbol": "PEPE"
+  },
+  {
+    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/3.json",
+    "name": "Sample PEPE for SWAP #03",
+    "symbol": "PEPE"
+  },
+  {
+    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/4.json",
+    "name": "Sample PEPE for SWAP #04",
+    "symbol": "PEPE"
+  }
+]

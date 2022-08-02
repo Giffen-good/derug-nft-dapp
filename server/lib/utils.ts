@@ -28,7 +28,6 @@ export const getUpdateAuthorityWallet = (): UpdateAuthorityWallet  => {
     const bytes = bs58.decode(secretKey);
     const keypair = Keypair.fromSecretKey(bytes);
     return {updateAuthorityWallet: new NodeWallet(keypair), updateAuthorityKeypair: keypair}
-
 }
 
 interface Meta {

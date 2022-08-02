@@ -1,0 +1,61 @@
+{
+  "name":"Sample PEPE for SWAP #04",
+  "symbol":"PEPE",
+  "description":"Sample of Pepes to generate NFTs to test the SWAP app",
+  "seller_fee_basis_points":750,
+  "image":"https://project89.mypinata.cloud/ipfs/QmVeHFLG3MyLTgTAGoGpuxMfdZB6a2zQ7Vt2ap3hJ3Cnif/cool-pepe.jpeg",
+  "external_url":"",
+  "collection":{
+    "name":"Giffen Good's PEPES",
+    "family":"LaunchMyNFT"
+  },
+  "attributes":[
+    {
+      "trait_type":"Background",
+      "value":"Desert"
+    },
+    {
+      "trait_type":"Body",
+      "value":"Black"
+    },
+    {
+      "trait_type":"Body Texture",
+      "value":"Tricolor"
+    },
+    {
+      "trait_type":"Arm",
+      "value":"Ice-cream"
+    },
+    {
+      "trait_type":"Clothes",
+      "value":"Purple-Hoodie"
+    },
+    {
+      "trait_type":"Eyes",
+      "value":"Strong-Black"
+    },
+    {
+      "trait_type":"Mouth",
+      "value":"Dull"
+    },
+    {
+      "trait_type":"Head",
+      "value":"Empty"
+    },
+    {
+      "trait_type":"Rarity Rank",
+      "value":433,
+      "display_type":"number",
+      "max_value":4444
+    }
+  ],
+  "properties":{
+    "files":[
+      {
+        "uri":"https://project89.mypinata.cloud/ipfs/QmVeHFLG3MyLTgTAGoGpuxMfdZB6a2zQ7Vt2ap3hJ3Cnif/cool-pepe.jpeg",
+        "type":"image/jpg"
+      }
+    ]
+
+  }
+}

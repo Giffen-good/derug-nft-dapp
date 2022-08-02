@@ -26,6 +26,7 @@ export function Swap(props: WalletContentProps) {
     } = props;
     const [burning, setBurning] = React.useState<boolean>(false);
     const [acceptedDisclaimer, setAcceptedDisclaimer] = React.useState<boolean>(false);
+    const [errors, setErrors] = React.useState<Burnable[]>([])
     const {
         publicKey,
         signAllTransactions
@@ -39,10 +40,6 @@ export function Swap(props: WalletContentProps) {
     const burnCount = React.useMemo(() => burningNfts.length, [burningNfts]);
     const [statusMessage, setStatusMessage] = React.useState<string>(burnCount ? `We found ${burnCount} Brave ${burnCount > 1 ? 'Cats' : 'Cat'} in your wallet!` : '');
     const [burnComplete, setBurnComplete] = React.useState<boolean>(false)
-    React.useEffect(() => {
-        onBurnComplete();
-    }, [burnMode]);
-
 
     async function onBurnComplete() {
         setAcceptedDisclaimer(false);
@@ -99,7 +96,6 @@ export function Swap(props: WalletContentProps) {
             const serializedTxs = await getMintAndBurnTxs(burningNfts, publicKey);
             const transactions = unpackTxs(serializedTxs);
             signedTransactions = await signAllTransactions(transactions);
-            console.log(signedTransactions)
         } catch (err) {
             console.log(err)
             setStatusMessage(`${(err as any).toString()}\n`);
@@ -127,12 +123,10 @@ export function Swap(props: WalletContentProps) {
 
         let successfullyBurnt: Burnable[] = [];
         let timeouts: Burnable[] = [];
-        let errors: Burnable[] = [];
         let errorMessages = [];
 
         for (const transaction of inProgressTransactions) {
             const nft = burningNfts[i]
-            console.log({transaction})
             const {
                 error,
                 timeout,
@@ -140,9 +134,11 @@ export function Swap(props: WalletContentProps) {
 
             if (timeout) {
                 timeouts = timeouts.concat(nft);
+                setErrors([...errors, nft])
             } else if (error) {
-                errors = errors.concat(nft);
                 errorMessages.push(error);
+                setErrors([...errors, nft])
+                console.log(error)
             } else {
                 successfullyBurnt = successfullyBurnt.concat(nft);
             }
@@ -168,13 +164,12 @@ export function Swap(props: WalletContentProps) {
                 `Solana network may be congested, try again, or reload the page if they are truly burnt.\n\n`;
         }
 
-        if (errors.length > 0) {
+        if (errorMessages.length > 0) {
 
-            let countMsg = errors.length > 1
-                ? `${errors.length} ${burnTypeLower}s`
+            let countMsg = errorMessages.length > 1
+                ? `${errorMessages.length} ${burnTypeLower}s`
                 : burnTypeLower;
-
-            message += `Encountered errors burning ${countMsg}:\n${errorMessages.join('\n')}`;
+            message += `Encountered errors burning ${countMsg}:\n${errorMessages.join('\n\n')}`;
 
             let haveTrulyBurntError = false;
             let haveNodeBehindError = false;
@@ -272,7 +267,7 @@ export function Swap(props: WalletContentProps) {
         window.location.reload()
     }
     const BurnButton = () => {
-        if (burnComplete && !burning && burnCount > MAX_BURNS_PER_TX) {
+        if (burnComplete && !burning && burnCount > MAX_BURNS_PER_TX && !errors.length) {
             return (
                 <button className={'bg-black text-4xl  text-white rounded-full mt-4 py-2  px-16'}
                         onClick={refreshPage}
@@ -330,7 +325,7 @@ export function Swap(props: WalletContentProps) {
                             )}
                             {statusMessage !== '' && (
                                 <div>
-                                    {statusMessage}
+                                    {statusMessage.split('\n').map((str,n) => <p className={`mt-4 ${n > 0 ? 'text-left': ''}`}>{str}</p>)}
                                 </div>
                             )}
                             {!burning && (
