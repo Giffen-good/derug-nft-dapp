@@ -49,11 +49,11 @@ export function Swap(props: WalletContentProps) {
     async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
         try {
             setStatusMessage('Building Transactions - Please Wait...')
+            setBurning(true);
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
                 nfts
             })
-            // console.log(JSON.stringify(data, null, 4))
             return data.txs;
 
         } catch (error) {
@@ -275,7 +275,7 @@ export function Swap(props: WalletContentProps) {
                     SWAP MORE
                 </button>
             )
-        } else if (burnComplete) {
+        } else if (burning || burnComplete) {
             return <div></div>
         } else {
             return (
