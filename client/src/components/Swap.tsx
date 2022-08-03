@@ -70,7 +70,6 @@ export function Swap(props: WalletContentProps) {
         const txs = []
         for (const sTx of serializedTxs) {
             const tx = Transaction.from(Buffer.from(sTx, 'base64'));
-            console.log({tx})
             txs.push(tx)
         }
         return txs;
@@ -205,6 +204,7 @@ export function Swap(props: WalletContentProps) {
         console.log('sendAndConfirmTransaction')
 
         try {
+            const latestBlockHash = await connection.getLatestBlockhash();
             const signature = await connection.sendRawTransaction(transaction.serialize());
             let timeoutID;
 
@@ -213,8 +213,11 @@ export function Swap(props: WalletContentProps) {
                     reject();
                 }, 1000 * 30);
             });
-
-            const result = connection.confirmTransaction(signature!, 'processed');
+            const result = await connection.confirmTransaction({
+                blockhash: latestBlockHash.blockhash,
+                lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+                signature,
+            });
             try {
                 /* Wait for result or wait for timeout */
                 const res = await Promise.race([timeout, result]);

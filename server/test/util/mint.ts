@@ -19,27 +19,36 @@ interface MintIxRes {
     mint: Keypair;
 }
 interface ipfsPin {
-    ipfsURL: string;
+    pin: string;
     name: string;
     symbol: string;
 }
-export const createMintTx = async (connection: Connection, userPublicKey: PublicKey, ipfsPin: ipfsPin )
+export const createMintTx = async (connection: Connection, updateAuthorityPublicKey: PublicKey, userPublicKey: PublicKey, ipfsPin: ipfsPin )
     : Promise<MintIxRes> => {
     let mint = Keypair.generate();
     console.log(`mint: ${mint.publicKey.toBase58()}`);
     let ata = await getAssociatedTokenAddress(mint.publicKey, userPublicKey);
-    const { ipfsURL, name, symbol } = ipfsPin
+    const { pin, name, symbol } = ipfsPin
+    const ipfsURL = `https://project89.mypinata.cloud/ipfs/${pin}`
 
     let tokenMetadataPubkey = await getMetadataPDA(mint.publicKey);
     let masterEditionPubkey = await getMasterEditionPDA(mint.publicKey);
 
     const creators = [
         {
-            address: userPublicKey,
+            address: updateAuthorityPublicKey,
             verified: true,
             share: 100,
         }
     ]
+
+    if (updateAuthorityPublicKey.toString() !== userPublicKey.toString()) {
+        creators.push({
+            address: userPublicKey,
+            verified: false,
+            share: 0,
+        })
+    }
 
     let mintIx = [
         SystemProgram.createAccount({
@@ -58,7 +67,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                 mint: mint.publicKey,
                 mintAuthority: userPublicKey,
                 payer: userPublicKey,
-                updateAuthority: userPublicKey,
+                updateAuthority: updateAuthorityPublicKey,
             },
             {
                 createMetadataAccountArgsV2: {
@@ -79,7 +88,7 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
             {
                 edition: masterEditionPubkey,
                 mint: mint.publicKey,
-                updateAuthority: userPublicKey,
+                updateAuthority: updateAuthorityPublicKey,
                 mintAuthority: userPublicKey,
                 payer: userPublicKey,
                 metadata: tokenMetadataPubkey,

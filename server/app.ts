@@ -27,7 +27,12 @@ const options: cors.CorsOptions = {
 
 const app = express()
 const port = process.env.PORT || 8080
-const connection = new Connection(RPC_URL);
+const connection = new Connection(RPC_URL, {
+  httpHeaders: {
+    'Content-Type': 'application/json',
+    'Referer': 'https://api.bravecatsociety.com'
+  }
+});
 
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
