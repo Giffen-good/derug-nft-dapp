@@ -50,9 +50,13 @@ export function Swap(props: WalletContentProps) {
         try {
             setStatusMessage('Building Transactions - Please Wait...')
             setBurning(true);
+            let nextBurn = nfts
+            if (nfts.length > MAX_BURNS_PER_TX) {
+                nextBurn = nextBurn.slice(0, MAX_BURNS_PER_TX)
+            }
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
-                nfts
+                nfts: nextBurn
             })
             return data.txs;
 
