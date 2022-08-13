@@ -29,8 +29,9 @@ export const buildTransactions = async (
 
         )
         const signers = [updateAuthorityKeypair, mint];
-
-        tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+        const latestBlockhash = await connection.getLatestBlockhash()
+        tx.recentBlockhash = latestBlockhash.blockhash;
+        tx.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
         tx.partialSign(...signers)
         transactions.push(tx.serialize({requireAllSignatures: false}).toString('base64'))
         if (MAX_BURNS_PER_TX < transactions.length - 1) break;

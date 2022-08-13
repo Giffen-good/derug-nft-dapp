@@ -30,6 +30,12 @@ export const getUpdateAuthorityWallet = (): UpdateAuthorityWallet  => {
     return {updateAuthorityWallet: new NodeWallet(keypair), updateAuthorityKeypair: keypair}
 }
 
+export const getKeypairFromSecret = (secret: string): Keypair  => {
+    const bytes = bs58.decode(secret);
+    const keypair = Keypair.fromSecretKey(bytes);
+    return keypair;
+}
+
 interface Meta {
     name: string;
     symbol: string;
@@ -40,9 +46,7 @@ interface IpfsTable {
 }
 
 export const getIpfsMeta = (tokenAddress: string): Meta =>  {
-    console.log(`${global.__basedir}/map/${HASHMAP_FILE}`)
     const res = fs.readFileSync(`${global.__basedir}/map/${HASHMAP_FILE}`,'utf8');
-    console.log(tokenAddress)
     const json: IpfsTable = JSON.parse(res)
     return json[tokenAddress];
 }

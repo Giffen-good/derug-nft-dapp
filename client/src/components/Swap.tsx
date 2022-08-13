@@ -49,11 +49,15 @@ export function Swap(props: WalletContentProps) {
     async function getMintAndBurnTxs(nfts: Burnable[], publicKey: PublicKey) : Promise<string[]> {
         try {
             setStatusMessage('Building Transactions - Please Wait...')
+            setBurning(true);
+            let nextBurn = nfts
+            if (nfts.length > MAX_BURNS_PER_TX) {
+                nextBurn = nextBurn.slice(0, MAX_BURNS_PER_TX)
+            }
             const { data } = await axios.post(API_URL + '/createMintAndBurnIX', {
                 key: publicKey.toString(),
-                nfts
+                nfts: nextBurn
             })
-            // console.log(JSON.stringify(data, null, 4))
             return data.txs;
 
         } catch (error) {
@@ -86,7 +90,7 @@ export function Swap(props: WalletContentProps) {
             confirmTransactionInitialTimeout: 30 * 1000,
             httpHeaders: {
                 'Content-Type': 'application/json',
-                'Referer': 'https://bravecats.com'
+                'Referer': 'https://bravecatsociety.com'
             }
         });
         if (!publicKey) return
@@ -204,6 +208,7 @@ export function Swap(props: WalletContentProps) {
         console.log('sendAndConfirmTransaction')
 
         try {
+            const latestBlockHash = await connection.getLatestBlockhash();
             const signature = await connection.sendRawTransaction(transaction.serialize());
             let timeoutID;
 
@@ -212,8 +217,11 @@ export function Swap(props: WalletContentProps) {
                     reject();
                 }, 1000 * 30);
             });
-
-            const result = connection.confirmTransaction(signature!, 'processed');
+            const result = await connection.confirmTransaction({
+                blockhash: latestBlockHash.blockhash,
+                lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+                signature,
+            });
             try {
                 /* Wait for result or wait for timeout */
                 const res = await Promise.race([timeout, result]);
@@ -275,7 +283,7 @@ export function Swap(props: WalletContentProps) {
                     SWAP MORE
                 </button>
             )
-        } else if (burnComplete) {
+        } else if (burning || burnComplete) {
             return <div></div>
         } else {
             return (
@@ -325,7 +333,7 @@ export function Swap(props: WalletContentProps) {
                             )}
                             {statusMessage !== '' && (
                                 <div>
-                                    {statusMessage.split('\n').map((str,n) => <p className={`mt-4 ${n > 0 ? 'text-left': ''}`}>{str}</p>)}
+                                    {statusMessage.split('\n').map((str,n) => <p key={n} className={`mt-4 ${n > 0 ? 'text-left': ''}`}>{str}</p>)}
                                 </div>
                             )}
                             {!burning && (

@@ -89,15 +89,15 @@ export const createMintTx = async (connection: Connection, userPublicKey: Public
                 },
             }
         ),
-        createSetAndVerifyCollectionInstruction({
-            collection: collectionMetadataPubkey,
-            collectionAuthority: updateAuthorityKeypair.publicKey,
-            collectionMasterEditionAccount: collectionMasterEditionPubkey,
-            collectionMint: collectionMint,
-            metadata: tokenMetadataPubkey,
-            payer: userPublicKey,
-            updateAuthority: updateAuthorityKeypair.publicKey
-        }),
+        // createSetAndVerifyCollectionInstruction({
+        //     collection: collectionMetadataPubkey,
+        //     collectionAuthority: updateAuthorityKeypair.publicKey,
+        //     collectionMasterEditionAccount: collectionMasterEditionPubkey,
+        //     collectionMint: collectionMint,
+        //     metadata: tokenMetadataPubkey,
+        //     payer: userPublicKey,
+        //     updateAuthority: updateAuthorityKeypair.publicKey
+        // }),
         createCreateMasterEditionV3Instruction(
             {
                 edition: masterEditionPubkey,

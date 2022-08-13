@@ -1,26 +1,26 @@
 [
   {
-    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/0.json",
+    "pin": "QmU46BDq4PaecAFkK8edNYDPaSe7RB5wMdTk6LJn6BrzSm",
     "name": "Sample PEPE for SWAP #00",
     "symbol": "PEPE"
   },
   {
-    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/1.json",
+    "pin": "QmcW3AfJzhwxoLcLdo4gqTgv9bR1SDTbuh3Tm4J8ALuHFV",
     "name": "Sample PEPE for SWAP #01",
     "symbol": "PEPE"
   },
   {
-    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/2.json",
+    "pin": "QmbJ2V1ZP8vy62jQKgbKszDVxcVT3ybFxsHiudiZ93wops",
     "name": "Sample PEPE for SWAP #02",
     "symbol": "PEPE"
   },
   {
-    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/3.json",
+    "pin": "QmWgXjw9FyjhbsudyU8kC9s6DsA3GYJUT635h42xAEqsx8",
     "name": "Sample PEPE for SWAP #03",
     "symbol": "PEPE"
   },
   {
-    "ipfsURL": "https://project89.mypinata.cloud/ipfs/QmdfLLqkQycSmMDek5G2WoZoFR3trcoJ3nsw9mqwRHG6ZV/4.json",
+    "pin": "Qmd2S5yuYQMRpG3FtGRyDm4DEcCeCLW4YWhinvxxHeQVfn",
     "name": "Sample PEPE for SWAP #04",
     "symbol": "PEPE"
   }
